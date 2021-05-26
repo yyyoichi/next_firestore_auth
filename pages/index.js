@@ -1,9 +1,29 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import WriteProfileToCloudFirestore from '../components/cloudFirestore/Writee'
+import ReadDataFromCloudFirestore from '../components/cloudFirestore/Read'
+import initFirebase from '../firebase/initFirebase'
+import { useUser } from '../firebase/useUser'
+import { useState } from 'react'
 
+initFirebase()
 export default function Home() {
-  return (
+  let { user, logout } = useUser();
+  console.log('index');
+  console.log(user);
+  // const [nowUser, setNowUser] = useState(user);
+  if (user) {
+    return (
+      <>
+        <h1>{user.name || user.email }</h1>
+        <p>{user.belong}</p>
+        <h2>{user.uid}</h2>
+        <button onClick={()=>logout()}>log out!</button>
+      </>
+    )
+  }
+  else return (
     <div className={styles.container}>
       <Head>
         <title>Create Next App</title>
@@ -12,9 +32,12 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
+
         <h1 className={styles.title}>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
+        <a href="/auth">auth</a>
+        
 
         <p className={styles.description}>
           Get started by editing{' '}
