@@ -1,0 +1,13 @@
+.qr-box{
+  margin: 150px auto 0;
+  text-align: center;
+}
+.update-qr{
+  display: block;
+  margin: 50px auto;
+  text-align: center;
+  width: 50%;
+}
+/* .qrcode{
+  margin:0 auto;
+} */

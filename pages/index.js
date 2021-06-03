@@ -6,6 +6,7 @@ import ReadDataFromCloudFirestore from '../components/cloudFirestore/Read'
 import initFirebase from '../firebase/initFirebase'
 import { useUser } from '../firebase/useUser'
 import { useState } from 'react'
+import MakeQr from '../components/qrcode/MakeQr'
 
 initFirebase()
 export default function Home() {
@@ -16,8 +17,10 @@ export default function Home() {
   if (user) {
     return (
       <>
-        <h2>{user.id}</h2>
-        <button onClick={()=>logout()}>log out!</button>
+      
+        {/* <h2>{user.id}</h2> */}
+        <MakeQr id={user.id}/>
+        <button onClick={() => logout()}>log out!</button>
       </>
     )
   }
@@ -34,8 +37,9 @@ export default function Home() {
         <h1 className={styles.title}>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
-        <a href="/auth">auth</a>
-        
+        <div>
+          <a href="/auth">LOGIN</a>
+        </div>
 
         <p className={styles.description}>
           Get started by editing{' '}
