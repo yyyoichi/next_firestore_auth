@@ -5,7 +5,6 @@ import firebase from 'firebase/app'
 import 'firebase/auth'
 import { setUserCookie } from '../../firebase/userCookies'
 import { mapUserData } from '../../firebase/mapUserData'
-// import ReadUserDataFromCloudFirestore from '../cloudFirestore/Read'
 
 initFirebase() // initialize firebase
 
@@ -16,17 +15,19 @@ const firebaseAuthConfig = {
     signInOptions: [
         {
             provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-            requireDisplayName: false,
+            requireDisplayName: true,
         },
         // add additional auth flows below
+        // firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        // firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+        // firebase.auth.GithubAuthProvider.PROVIDER_ID,
     ],
     signInSuccessUrl: '/',
     credentialHelper: 'none',
     callbacks: {
         signInSuccessWithAuthResult: async ({ user }, redirectUrl) => {
-            console.log('sign in classback')
-            const userData = await mapUserData(user);
-            setUserCookie(userData);
+            const userData = mapUserData(user)
+            setUserCookie(userData)
         },
     },
 }

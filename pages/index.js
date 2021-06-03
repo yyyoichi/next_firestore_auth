@@ -16,9 +16,7 @@ export default function Home() {
   if (user) {
     return (
       <>
-        <h1>{user.name || user.email }</h1>
-        <p>{user.belong}</p>
-        <h2>{user.uid}</h2>
+        <h2>{user.id}</h2>
         <button onClick={()=>logout()}>log out!</button>
       </>
     )

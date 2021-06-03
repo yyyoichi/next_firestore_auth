@@ -1,16 +1,10 @@
-import ReadUserDataFromCloudFirestore from "../components/cloudFirestore/Read";
-
-export const  mapUserData = async (user) => {
-  const { user_name, belong, profile, follows } = await ReadUserDataFromCloudFirestore(user);
-  const { uid, email, xa } = user;
+export const mapUserData = (user) => {
+  const { uid, email, xa, displayName, photoUrl } = user
   return {
-    uid,
-    email,
-    belong,
-    follows,
-    profile,
-    token: xa,
-    name: user_name,
+      id: uid,
+      email,
+      token: xa,
+      name: displayName,
+      profilePic: photoUrl
   }
 }
-//  default mapUserData;
