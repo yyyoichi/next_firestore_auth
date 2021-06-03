@@ -8,7 +8,7 @@ import { useUser } from '../firebase/useUser'
 import { useState } from 'react'
 import MakeQr from '../components/qrcode/MakeQr'
 
-initFirebase()
+
 export default function Home() {
   let { user, logout } = useUser();
   console.log('index');
@@ -17,8 +17,6 @@ export default function Home() {
   if (user) {
     return (
       <>
-      
-        {/* <h2>{user.id}</h2> */}
         <MakeQr id={user.id}/>
         <button onClick={() => logout()}>log out!</button>
       </>
