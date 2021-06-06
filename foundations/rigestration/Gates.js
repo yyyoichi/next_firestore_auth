@@ -27,9 +27,9 @@ export default function Gates({ forms, handleChange, setForms, token }) {
       return
     }
     setGateUrlState("検証中")
-    const testURL = "https://script.google.com/macros/s/AKfycbyn3xDxzxNHsvoBq67GN27Gga-wfB2q0PfBy_MUSLX-ZciJX_ejHbWWOAauX6S1HvtW/exec";
-    const data = await initFetcher(testURL, token)
-    if (data["status"]) {
+    const testURL = "https://script.google.com/macros/s/AKfycbzS-2IMbrkG9nLfCdAufVkuZ26uR_gph27Uwr3vMiwEoiN5oPeoeNBctAdrgpTsp4WmWw/exec";
+    const res = await initFetcher(testURL, token)
+    if (res) {
       const newGetesUrl = [...forms.gatesUrl,{gateName, gateUrl}]
       setNewGatesUrl(newGetesUrl)
       setGateUrl("")

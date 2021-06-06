@@ -9,7 +9,7 @@ export default function User({ forms, setForms, token }) {
   const [registrationType, setRegistrationType] = useState("input")
 
   const setNewUserRegistrationItems = (newUserRegistrationItems) => {
-    const newForm = {...forms, "userRegistrationItems": newUserRegistrationItems }
+    const newForm = { ...forms, "userRegistrationItems": newUserRegistrationItems }
     setForms(newForm)
   }
 
@@ -21,24 +21,24 @@ export default function User({ forms, setForms, token }) {
     }
     const header = registrationHeader
     const type = registrationType
-    const newUserRegistrationItems = [...forms.userRegistrationItems,{header, type}]
+    const newUserRegistrationItems = [...forms.userRegistrationItems, { header, type }]
     setNewUserRegistrationItems(newUserRegistrationItems)
     setRegistrationHeader("")
     setRegistrationType("input")
   }
 
   const deleteUserRegistrationItem = (index) => {
-    const newUserRegistrationItems = forms.userRegistrationItems.filter(( _, i) => i !== index)
+    const newUserRegistrationItems = forms.userRegistrationItems.filter((_, i) => i !== index)
     setNewUserRegistrationItems(newUserRegistrationItems)
   }
 
-  
+
   const [usersUrlState, setUsersUrlState] = useState("未検証")
   const [inputUsersUrl, setInputUsersUrl] = useState("")
 
-  
 
-  const initUsersDb = async () => {
+
+  const initUsersDb = () => {
     console.log(inputUsersUrl)
     if (!inputUsersUrl) {
       alert('ウェブアプリURLを記入してください。')
@@ -46,12 +46,13 @@ export default function User({ forms, setForms, token }) {
     }
     setUsersUrlState("検証中")
     const testURL = "https://script.google.com/macros/s/AKfycbzS-2IMbrkG9nLfCdAufVkuZ26uR_gph27Uwr3vMiwEoiN5oPeoeNBctAdrgpTsp4WmWw/exec";
-    const data = await initFetcher(testURL, token)
-    const statusText = data["status"] ? "検証成功" : "検証失敗";
-    setUsersUrlState(statusText)
-
-    const newForm = {...forms, "usersDbUrl": inputUsersUrl }
-    setForms(newForm)
+    initFetcher(testURL, token).then(res => {
+      setUsersUrlState("検証成功")
+      const newForm = { ...forms, "usersDbUrl": inputUsersUrl }
+      setForms(newForm)
+    }).catch(e => {
+      setUsersUrlState("検証失敗")
+    })
   }
 
   return (
@@ -76,7 +77,7 @@ export default function User({ forms, setForms, token }) {
         <option value="input" defaultValue>記述（短文）</option>
         <option value="textarea">記述（長文）</option>
       </select>
-      <button onClick={addUserRegistrationItem}>項目追加</button>
+      <button onClick={addUserRegistrationItem}>登録・追加</button>
       <ul>
         {
           forms.userRegistrationItems.map(({ header, type }, index) => {
