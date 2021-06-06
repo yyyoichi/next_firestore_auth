@@ -9,6 +9,7 @@ import { useState } from 'react'
 import MakeQr from '../components/qrcode/MakeQr'
 
 
+
 export default function Home() {
   let { user, logout } = useUser();
   console.log('index');
