@@ -28,7 +28,7 @@ export default function Gates({ forms, handleChange, setForms, token }) {
       return
     }
     setGateUrlState("検証中")
-    initFetcher(gateUrl, token).then(res => {
+    initFetcher(gateUrl, token).then( res => {
       const newGetesUrl = [...forms.gatesUrl,{gateName, gateUrl}]
       setNewGatesUrl(newGetesUrl)
       setGateUrl("")

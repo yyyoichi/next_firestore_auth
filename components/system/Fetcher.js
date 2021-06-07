@@ -6,8 +6,8 @@
  */
 export const initFetcher = async (url, token) => {
   const type = 'init'
-  const data = {token, type}
-  const res = await fetcher( url, data)
+  const data = { token, type }
+  const res = await fetcher(url, data)
   console.log(res)
   return res;
 }
@@ -31,15 +31,15 @@ export const fetcher = async (url, data) => {
     crossDomain: true,
     redirect: 'follow'
   }
-  
+
   try {
-    let res = await fetch(url , options)
+    let res = await fetch(url, options)
     const json = await res.json(res)
     // console.log(json)
-    if(json["status"] === "reject"){
+    if (json["status"] === "reject") {
       throw new Error("アクセスが拒否されました。")
-    }else if (json["status"] === "failture" ){
-      throw new Error("プログラム実行中にエラーが発生しました。")
+    } else if (json["status"] === "failture") {
+      throw new Error("プログラム実行中にエラーが発生しました。\n" + json["message"])
     }
     return json
 
@@ -52,18 +52,16 @@ export const fetcher = async (url, data) => {
  * 記録用フォルダIDを渡してゲート用ウェブアプリをセットアップ
  * @param {String} res.folderId
  * @param {String} res.sheetId 
- * @param {String} token 
- * @param {Object} forms 
+ * @param {Object} d 
  * @returns 
  */
-export const setupAllGate  = async ({folderId, sheetId}, token, forms) => {
-  const type = "setup"
-  const {gatesUrl} = forms
+export const setupAllGate = async ({ folderId, sheetId }, d) => {
+  const { gatesUrl } = d
   return await Promise.all(
-    gatesUrl.map( async gate => {
-      const {gateName, gateUrl} = gate
-      const data = { token, type, folderId, sheetId, gateName, ...forms}
+    gatesUrl.map(async gate => {
+      const { gateName, gateUrl } = gate
+      const data = { folderId, sheetId, gateName, ...d }
       return await fetcher(gateUrl, data)
     })
   )
-} 
+}
