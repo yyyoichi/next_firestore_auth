@@ -33,10 +33,10 @@ export default function Registration() {
     discription: "今日は晴れ",
     userRegistrationItems: [{"header": "氏名", "type": "input"},{"header": "カナ", "type": "input"}],
     usersDbUrl: "https://script.google.com/macros/s/AKfycbzS-2IMbrkG9nLfCdAufVkuZ26uR_gph27Uwr3vMiwEoiN5oPeoeNBctAdrgpTsp4WmWw/exec",
-    gatesUrl: [gate],
+    gatesUrl: [{geteName: "正門",gateUrl:gate}],
     resetTime: 4
   }
-  const [forms, setForms] = useState(testInit)
+  const [forms, setForms] = useState(init)
   const [token] = useState(Token)
   const [submitState, setSubmitState] = useState(false)
 
@@ -53,7 +53,7 @@ export default function Registration() {
 
   const eventRegister = (event) => {
     event.preventDefault()
-    setSubmitState("送信中")
+    
     console.log(forms)
     if(!forms.gatesUrl.length){
       alert("ゲート用ウェブアプリURLが未設定です")
@@ -61,19 +61,25 @@ export default function Registration() {
     }else if(!forms.userRegistrationItems.length){
       alert("参加者データ収集項目は1つ以上登録してください。")
       return
+    }else if(!forms.usersDbUrl){
+      alert("参加者データ用ウェブアプリURLが未設定、または未検証です。")
+      return
     }
+    setSubmitState("送信中")
     const type = "setup"
-    const data = { token, type }
+    const data = { token, type, ...forms }
     fetcher(forms.usersDbUrl, data).then(res => {
-      setSubmitState("成功")
+      setSubmitState("参加者データ用ウェブアプリのセット完了")
       console.log(res)
-      
-      return setupAllGate( res, token, forms.gatesUrl)
+      return setupAllGate( res, token, forms)
+
     }).then(res => {
       console.log(res)
+      setSubmitState("ゲート用ウェブアプリのセット完了")
     }).catch(e => {
       alert(e)
       setSubmitState("失敗")
+
     });
 
 

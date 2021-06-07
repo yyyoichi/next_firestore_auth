@@ -13,7 +13,8 @@ export default function User({ forms, setForms, token }) {
     setForms(newForm)
   }
 
-  const addUserRegistrationItem = () => {
+  const addUserRegistrationItem = (e) => {
+    e.preventDefault()
     console.log(registrationHeader, registrationType)
     if (!registrationHeader || !registrationType) {
       alert('項目名を記入してください')
@@ -27,7 +28,8 @@ export default function User({ forms, setForms, token }) {
     setRegistrationType("input")
   }
 
-  const deleteUserRegistrationItem = (index) => {
+  const deleteUserRegistrationItem = ( e, index) => {
+    e.preventDefault()
     const newUserRegistrationItems = forms.userRegistrationItems.filter((_, i) => i !== index)
     setNewUserRegistrationItems(newUserRegistrationItems)
   }
@@ -38,7 +40,8 @@ export default function User({ forms, setForms, token }) {
 
 
 
-  const initUsersDb = () => {
+  const initUsersDb = (e) => {
+    e.preventDefault()
     console.log(inputUsersUrl)
     if (!inputUsersUrl) {
       alert('ウェブアプリURLを記入してください。')
@@ -84,7 +87,7 @@ export default function User({ forms, setForms, token }) {
             const text = type === "input" ? header + ", 記述（短文）" : header + ", 記述（長文）";
             return <li key={index}>
               {text}
-              <button key={index} onClick={() => deleteUserRegistrationItem(index)}>削除</button>
+              <button key={index} onClick={(e) => deleteUserRegistrationItem( e, index)}>削除</button>
             </li>
           })
         }

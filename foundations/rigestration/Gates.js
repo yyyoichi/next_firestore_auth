@@ -14,7 +14,8 @@ export default function Gates({ forms, handleChange, setForms, token }) {
     setForms(newForm)
   }
 
-  const addGate = async () => {
+  const addGate = (e) => {
+    e.preventDefault()
     console.log(gateUrl, gateName)
     if (!gateUrl && !gateName) {
       alert('ゲート名, ウェブアプリURLを記入してください')
@@ -27,21 +28,23 @@ export default function Gates({ forms, handleChange, setForms, token }) {
       return
     }
     setGateUrlState("検証中")
-    const testURL = "https://script.google.com/macros/s/AKfycbzS-2IMbrkG9nLfCdAufVkuZ26uR_gph27Uwr3vMiwEoiN5oPeoeNBctAdrgpTsp4WmWw/exec";
-    const res = await initFetcher(testURL, token)
-    if (res) {
+    initFetcher(gateUrl, token).then(res => {
       const newGetesUrl = [...forms.gatesUrl,{gateName, gateUrl}]
       setNewGatesUrl(newGetesUrl)
       setGateUrl("")
       setGateName("")
-      setGateUrlState("未検証")
-    }else{
+      setGateUrlState("検証成功")
+      setTimeout(()=> setGateUrlState("未検証"), 1000)
+      
+    }).catch( e => {
       setGateUrlState("検証失敗")
-    }
+    })
   }
 
-  const deleteGate = (index) => {
-    const newGatesUrl = forms.getesUrl.filter((_, i) => i !== index)
+  const deleteGate = ( e, index) => {
+    e.preventDefault()
+    const gates = forms.gatesUrl;
+    const newGatesUrl = gates.filter((_, i) => i !== index)
     setNewGatesUrl(newGatesUrl)
   }
 
@@ -77,7 +80,7 @@ export default function Gates({ forms, handleChange, setForms, token }) {
 
               return <li key={index}>
                 {gateName + ", " + gateUrl}
-                <button key={index} onClick={() => deleteGate(index)}>削除</button>
+                <button key={index} onClick={(e) => deleteGate( e,index)}>削除</button>
               </li>
             })
           }
