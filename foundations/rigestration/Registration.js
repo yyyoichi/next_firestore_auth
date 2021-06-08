@@ -105,6 +105,12 @@ export default function Registration() {
         const url = process.env.NEXT_PUBLIC_EVENTS_DATABASE_URL
         const access_token = process.env.NEXT_PUBLIC_GAS_API_KEY
         return fetcher(url, {...getData("newEventOpen", access_token), key})
+      }).then(res => {
+        setSubmitState("イベント登録成功")
+        const key = res["res"]
+        const url = process.env.NEXT_PUBLIC_USER_DATABASE_URL
+        const access_token = process.env.NEXT_PUBLIC_GAS_API_KEY
+        return fetcher(url,  {...getData("newEvent", access_token), key, id:user.id})
       })
       .then(res => {
         console.log(res)

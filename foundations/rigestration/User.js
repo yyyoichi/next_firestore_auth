@@ -17,7 +17,7 @@ export default function User({ forms, setForms, token }) {
     e.preventDefault()
     console.log(registrationHeader, registrationType)
     if (!registrationHeader || !registrationType) {
-      alert('項目名を記入してください')
+      alert("空欄があります.")
       return
     }
     const header = registrationHeader

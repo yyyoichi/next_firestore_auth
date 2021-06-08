@@ -5,7 +5,7 @@ import { useUser } from '../../firebase/useUser'
 export default async function CreateEvent({ id, eventId, usersDbUrl, gatesUrl, eventName, token, key }) {
   console.log("eventId:" + eventId)
   try {
-    await firebase.firestore()
+    const doc = await firebase.firestore()
       .collection("testUsers")
       .doc(id)
       .collection("events")
