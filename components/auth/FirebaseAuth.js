@@ -28,6 +28,8 @@ const firebaseAuthConfig = {
         signInSuccessWithAuthResult: async ({ user }, redirectUrl) => {
             const userData = mapUserData(user)
             setUserCookie(userData)
+            console.log('redirectUrl')
+            console.log(redirectUrl)
         },
     },
 }

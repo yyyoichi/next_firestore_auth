@@ -39,7 +39,8 @@ export const fetcher = async (url, data) => {
     if (json["status"] === "reject") {
       throw new Error("アクセスが拒否されました。")
     } else if (json["status"] === "failture") {
-      throw new Error("プログラム実行中にエラーが発生しました。\n" + json["message"])
+      console.log(json)
+      throw new Error("プログラム実行中にエラーが発生しました。\n" + json["failture"])
     }
     return json
 
