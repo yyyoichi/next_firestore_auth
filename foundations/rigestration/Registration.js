@@ -5,7 +5,7 @@ import User from "./User"
 import Gates from "./Gates"
 import Token from "../../components/system/Token"
 import { fetcher, initFetcher, setupAllGate } from "../../components/system/Fetcher"
-import CreateEvent from "../../components/cloudFirestore/CreateEvent"
+import createEvent from "../../components/cloudFirestore/createEvent"
 
 export default function Registration() {
   let { user, logout } = useUser()
@@ -35,7 +35,7 @@ export default function Registration() {
     start: "2021-06-09T18:02",
     end: "2021-06-09T18:02",
     discription: "今日は晴れ",
-    state: "opne",
+    state: "open",
     userRegistrationItems: [{ "header": "氏名", "type": "input" }, { "header": "カナ", "type": "input" }],
     usersDbUrl: "https://script.google.com/macros/s/AKfycbzS-2IMbrkG9nLfCdAufVkuZ26uR_gph27Uwr3vMiwEoiN5oPeoeNBctAdrgpTsp4WmWw/exec",
     gatesUrl: [{ geteName: "正門", gateUrl: gate }],
@@ -97,7 +97,7 @@ export default function Registration() {
         const key = res["res"]
         console.log(key)
         console.log(forms.eventId)
-        return CreateEvent({...forms, token, key, id:user.id } )
+        return createEvent({...forms, token, key, id:user.id } )
       })
       .then(key => {
         setSubmitState("管理者ページ作成成功")

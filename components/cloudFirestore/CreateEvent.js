@@ -2,7 +2,7 @@ import firebase from 'firebase/app'
 import 'firebase/firestore'
 import { useUser } from '../../firebase/useUser'
 
-export default async function CreateEvent({ id, eventId, usersDbUrl, gatesUrl, eventName, token, key }) {
+export default async function createEvent({ id, eventId, usersDbUrl, gatesUrl, eventName, token, key }) {
   console.log("eventId:" + eventId)
   console.log("id:" +id)
   try {

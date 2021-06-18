@@ -6,37 +6,44 @@ import { useUser } from "../../firebase/useUser";
 export default function Page({ data }) {
   console.log(data)
   const { user, logout } = useUser(false)
-  const { registrationItems, participantUrl } = data
-  const token = Token()
-  const [forms, setForms] = useState({ "access_token": token })
+  const { registrationItems, participantUrl, key, eventId } = data
+  const access_token = Token()
+  const [forms, setForms] = useState([])
 
   const createUi = ({ type }, i) => {
-    const formName = `index${i}`
+    // const formName = `index${i}`
     if (type === "input") {
-      return <input type="text" name={formName} value={forms[formName]} onChange={handleChange} required />
+      return <input type="text" name={i} value={forms[i]} onChange={handleChange} required />
     } else if (type === "textarea") {
-      return <textarea name={formName} value={forms[formName]} onChange={handleChange} required />
+      return <textarea name={i} value={forms[i]} onChange={handleChange} required />
     }
   }
 
   const handleChange = (e) => {
     const target = e.target
-    const name = e.target.name
+    const i = + e.target.name
     const value = target.value
 
-    const newForm = { ...forms, [name]: value }
+    const newForm = [...forms]
+    newForm[i] = value
     setForms(newForm)
-    fetcher(url)
+    console.log(forms)
+    // fetcher(url)
   }
 
   const eventRegister = (event) => {
     event.preventDefault()
-    fetcher(participantUrl, { forms, type: "addUser" })
+    fetcher(participantUrl, { forms, access_token, type: "addUser", id: user["id"] })
       .then(res => {
-        const key = res["res"]
+        console.log(res)
         const url = process.env.NEXT_PUBLIC_USER_DATABASE_URL
         const token = process.env.NEXT_PUBLIC_GAS_API_KEY
-        return fetcher(url, { token, type: "newParty", ...forms })
+        const data = { token, 
+          type: "newParty", 
+          access_token, 
+          id: user["id"], 
+          path: `${eventId}/${key}` }
+        return fetcher(url, data)
       })
       .catch(e => {
         alert(e)
