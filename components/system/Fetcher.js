@@ -1,3 +1,5 @@
+import { readEventData } from "../cloudFirestore/readEvent"
+
 /**
  * 
  * @param {String} url 
@@ -66,4 +68,23 @@ export const setupAllGate = async ({ folderId, sheetId }, d) => {
       return await fetcher(gateUrl, data)
     })
   )
+}
+
+export const getUsersDbViaFireStore = async (eventId, id, data) => {
+  const res = await readEventData(eventId, id)//データベース情報
+  console.log(res)
+  const resUsersData = await getUsersDb(res, data)//イベント参加者情報
+  console.log(resUsersData)
+  return {resUsersData, resDbData: res}
+}
+
+/**
+ * 個別イベント参加者データベースから参加者情報を取得
+ * @param {Object} param0 firestoreProperties
+ * @param {Object} data 
+ * @return {Array{}}
+ */
+export const getUsersDb = async ({usersDbUrl, token}, data) => {
+  const res = await fetcher(usersDbUrl, {...data, token})
+  return res["res"]
 }
