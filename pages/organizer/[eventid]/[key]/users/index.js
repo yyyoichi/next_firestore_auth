@@ -3,12 +3,7 @@ import Users from "../../../../../foundations/organizer/Users";
 
 export default function Page(data) {
   console.log("page")
-  return (
-    <div>
-      aaa
-      <Users data={data} />
-    </div>
-  )
+  return <Users data={data} />
 }
 
 export async function getServerSideProps(context) {

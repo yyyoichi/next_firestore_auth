@@ -1,7 +1,7 @@
 import QRCode from "qrcode.react"
 import { useEffect, useState } from "react";
 
-export default function MakeQr(id) {
+export default function MakeQr({id}) {
   const getNow = () => {
     const now = + new Date().getTime();
     return id + "_timer_" + now;

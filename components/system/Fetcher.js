@@ -70,6 +70,14 @@ export const setupAllGate = async ({ folderId, sheetId }, d) => {
   )
 }
 
+/**
+ * 
+ * @param {Strng} eventId 
+ * @param {String} id 
+ * @param {object} data 
+ * @param {String} data.type
+ * @returns 
+ */
 export const getUsersDbViaFireStore = async (eventId, id, data) => {
   const res = await readEventData(eventId, id)//データベース情報
   console.log(res)
