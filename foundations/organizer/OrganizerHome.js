@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { memo, useState } from "react";
-import { getUsersDbViaFireStore } from "../../components/system/Fetcher";
+import { fetcher, getUsersDbViaFireStore } from "../../components/system/Fetcher";
 import { useUser } from "../../firebase/useUser";
 import ReadQr from "../../components/qrcode/Reader";
 
@@ -10,7 +10,7 @@ export default function OrganizerHome() {
   const { user, logout } = useUser()
 
   const [dbData, setDbData] = useState(null)//firestoreに保存されているデータ
-  const [usersData, setUsersData] = useState([])
+  const [usersData, setUsersData] = useState({})
   //Qr記録先のgateURLと入退のいずれか
   const [qrAccessBasics, setQrAccessBasics] = useState({ "gateUrl": "", "gateType": "" })
   const [submitState, setSubmitState] = useState("start")
@@ -19,34 +19,52 @@ export default function OrganizerHome() {
 
 
   const handleClick = (e) => {
+    console.log("click")
     const name = e.target.name
     const value = e.target.value
-    console.log("click")
+    setQr(false)
     const newBasics = { ...qrAccessBasics, [name]: value }
     setQrAccessBasics(newBasics)
-    // setQr(false)
-    console.log(newBasics)
     if (newBasics["gateUrl"] && newBasics["gateType"]) {
       if (submitState !== "go") setSubmitState("go")
-      if (!openQr) setQr(true)
+      setTimeout(()=>{ setQr(true) },1000)
     } else {//未選択項目がある場合
       setSubmitState("prepair")
       setQr(false)
     }
   }
 
-  const handleScan = data => {
-    // console.log(submitState)
-    if (!data || submitState !== "go") {
-      if (submitState !== "go") {
-        // return console.log(submitState)
-      }
-      return
-    }
-    setSubmitState("catching")
-    setQr(false)
+  const testClick = () => {
+    const uid = "zhKOnhKOG3TBy7QHcSTPnS6ThWq1"
+    const userdata = usersData[uid]
+    console.log("\ttest_userData")
+    console.log(userdata)
+    console.log("admission: "+userdata["admission"])
+  }
 
+  const handleScan = data => {
+    if (!data || submitState !== "go") return
+
+    const reOpen = () => {
+      setSubmitState("go")
+      setQr(true)
+    }
+    const handleError = errorType => {
+      setTimeout(reOpen, 1000 * 2)
+      return setSubmitState(errorType)
+    }
+
+    setSubmitState("catching")//メッセージ変更
+    setQr(false)//QRを閉じる
+
+    //QRから情報を取り出す
     const [uid, qrTime] = data["text"].split("_timer_")
+
+    const userData = usersData[uid]
+    console.log("\tuserData")
+    console.log(userData)
+    //申請してしない
+    if (!userData) handleError("no-entree")
 
     //QR生成時の時刻が10分前以上前なら不正なQrとして処理
     const timeLag = new Date().getTime() - qrTime
@@ -56,23 +74,40 @@ export default function OrganizerHome() {
 
     console.log("timeLag(minute):" + minute + "m" + second)
     // console.log(data)
-    const reOpen = () => {
-      setSubmitState("go")
-      setQr(true)
-      console.log(qrAccessBasics)
-    }
 
-    if (withinTheValidRange) {
-      setTimeout(reOpen, 1000 * 2)
-      return setSubmitState("timeover")
-    }
-    const userData = usersData[uid]
+    //時間切れ
+    // if (withinTheValidRange) return handleError("timeover")
+  
 
-    //許可されていないあるいは申請してしない
-    if (!userData || userData["state"] !== "yes") {
-      setTimeout(reOpen, 1000 * 2)
-      return setSubmitState("reject")
-    }
+    const { state, admission } = userData//
+    const { gateType, gateUrl } = qrAccessBasics//選択中のQR読み込み設定
+    console.log("\tqrAccessBasics")
+    console.log(qrAccessBasics)
+    //許可されていない
+    if (state !== "yes") return handleError("reject")
+    //2重記録
+    if (admission === gateType) return handleError("double")
+
+    const type = "enter"
+    const token = dbData["token"]
+    const usersDbUrl = dbData["usersDbUrl"]
+    const fetchData = { type, token, gateType, userData }
+
+    Promise.all([fetcher(usersDbUrl, fetchData),fetcher(gateUrl, fetchData)])
+    .then(res => {
+      console.log(res)
+      const newUserData = res[0]["res"]
+      const newUsersData = {...usersData, [uid]: newUserData}
+      console.log("\tnewUserData")
+      console.log(newUsersData[uid])
+      setUsersData(newUsersData)
+      reOpen()
+    })
+    .catch(e => {
+      alert(e)
+      console.error(e)
+    })
+
 
     setTimeout(reOpen, 1000 * 2)
   }
@@ -91,8 +126,10 @@ export default function OrganizerHome() {
     submitState === "go" ? "QR読み込み可能" :
       submitState === "catching" ? "処理中" :
         submitState === "timeover" ? "QRコードを更新してください" :
-          submitState === "reject" ? "入退が許可されていません" :
-            "";
+          submitState === "no-entree" ? "参加者申請がされていません" :
+            submitState === "reject" ? "入退が許可されていません" :
+              submitState === "double" ? "既に記録済みです" :
+                "";
   return (
 
     <>
@@ -104,6 +141,7 @@ export default function OrganizerHome() {
       }
       <ReadQr handleScan={handleScan} open={openQr} />
       <div>{qrStateMassage}</div>
+      <button onClick={testClick}>button</button>
     </>
   )
 }

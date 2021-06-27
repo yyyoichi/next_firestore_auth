@@ -25,7 +25,6 @@ export const initFetcher = async (url, token) => {
  * @returns 
  */
 export const fetcher = async (url, data) => {
-  console.log(data)
   const body = await JSON.stringify(data)
   const options = {
     'method': 'POST',
