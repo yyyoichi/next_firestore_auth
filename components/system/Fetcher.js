@@ -9,6 +9,7 @@ import { readEventData } from "../cloudFirestore/readEvent"
 export const initFetcher = async (url, token) => {
   const type = 'init'
   const data = { token, type }
+  console.log(data)
   const res = await fetcher(url, data)
   console.log(res)
   return res;

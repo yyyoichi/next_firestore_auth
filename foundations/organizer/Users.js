@@ -59,7 +59,9 @@ export default function Users({ data }) {
       token,
       "path": `${eventId}/${key}`,
       usersState,
+      "eventName": dbData["eventName"],
     }
+    console.log(data)
     // return;
     fetcher(url, data)
     .then(res => {
@@ -85,7 +87,7 @@ export default function Users({ data }) {
           <tr>
             <th>許可</th>
             <th>現状</th>
-            {registrationItems.map(({ header }) => <th key={header}>{header}</th>)}
+            {registrationItems.map(({ header }, i) => <th key={i}>{header}</th>)}
           </tr>
         </thead>
         <tbody>
@@ -93,7 +95,7 @@ export default function Users({ data }) {
             {
               !usersData.length ?
                 <tr><td>getData...</td></tr> :
-                usersData.map(x => <OneUser handle={handleClick} key={x["userId"]} user={x} />)
+                usersData.map((x, i) => <OneUser handle={handleClick} key={i} user={x} />)
             }
           </UsersStateContext.Provider>
         </tbody>

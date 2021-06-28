@@ -6,9 +6,12 @@ import Gates from "./Gates"
 import Token from "../../components/system/Token"
 import { fetcher, initFetcher, setupAllGate } from "../../components/system/Fetcher"
 import createEvent from "../../components/cloudFirestore/createEvent"
+import { useRouter } from "next/router"
+import { removeMyCookie } from "../../components/system/myCookie"
 
 export default function Registration() {
   let { user, logout } = useUser()
+  const router = useRouter()
   // console.log(user)
   const init = {
     eventId: "",
@@ -79,6 +82,7 @@ export default function Registration() {
       return { "token": access_token, "access_token": token, type, ...forms }
     }
 
+    let eventKey;
     fetcher(forms.usersDbUrl, getData("setup"))
       .then(res => {
         setSubmitState("参加者データ用ウェブアプリのセット完了")
@@ -95,34 +99,45 @@ export default function Registration() {
       .then(res => {
         setSubmitState("イベント書き込み成功")
         const key = res["res"]
+        eventKey = key
         console.log(key)
         console.log(forms.eventId)
-        return createEvent({...forms, token, key, id:user.id } )
+        return createEvent({ ...forms, token, key, id: user.id })
       })
       .then(key => {
         setSubmitState("管理者ページ作成成功")
         console.log(key)
         const url = process.env.NEXT_PUBLIC_EVENTS_DATABASE_URL
         const access_token = process.env.NEXT_PUBLIC_GAS_API_KEY
-        return fetcher(url, {...getData("newEventOpen", access_token), key})
+        const value = "OPEN"
+        return fetcher(url, { ...getData("updateState", access_token), key:eventKey, value })
       }).then(res => {
         setSubmitState("イベント登録成功")
         const key = res["res"]
+        console.log(res)
         const url = process.env.NEXT_PUBLIC_USER_DATABASE_URL
         const access_token = process.env.NEXT_PUBLIC_GAS_API_KEY
-        return fetcher(url,  {...getData("newEvent", access_token), key, id:user.id})
+        return fetcher(url, { ...getData("newEvent", access_token), key: eventKey, id: user.id })
       })
       .then(res => {
         console.log(res)
-        setSubmitState("すべての処理が完了し、イベント作成に成功しました。")
+        const path = `/organizer/${forms.eventId}/${eventKey}`
+        console.log(path)
+        setTimeout(() => router.push(path), 1000 * 2)
+        removeMyCookie()
+        setSubmitState("すべての処理が完了し、イベント作成に成功しました。2秒後に遷移します。")
       })
       .catch(e => {
-        alert(e)
+        setSubmitState("イベント作成に失敗しました")
         console.log(e)
-        setSubmitState("失敗")
+        const url = process.env.NEXT_PUBLIC_EVENTS_DATABASE_URL
+        const access_token = process.env.NEXT_PUBLIC_GAS_API_KEY
+        const value = "DELETE"
+        return fetcher(url, { ...getData("updateState", access_token), "key": eventKey, value })
 
+        .catch(e => alert(e))
       })
-      
+
 
 
   }

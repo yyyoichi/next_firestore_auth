@@ -16,7 +16,7 @@ export default function EventInfo({ data }) {
     <>
       <h1>{eventName}</h1>
       <h2>{organizer}</h2>
-      {discriptions.map(x => <p key={x}>{x}</p>)}
+      {discriptions.map((x,i) => <p key={i}>{x}</p>)}
       <div>
         {formatDate(start) + " ~ " + formatDate(end)}
       </div>

@@ -42,14 +42,14 @@ export default function User({ forms, setForms, token }) {
 
   const initUsersDb = (e) => {
     e.preventDefault()
-    console.log(inputUsersUrl)
     if (!inputUsersUrl) {
       alert('ウェブアプリURLを記入してください。')
       return
     }
     setUsersUrlState("検証中")
-    const testURL = "https://script.google.com/macros/s/AKfycbzS-2IMbrkG9nLfCdAufVkuZ26uR_gph27Uwr3vMiwEoiN5oPeoeNBctAdrgpTsp4WmWw/exec";
-    initFetcher(testURL, token).then(res => {
+    // console.log(inputUsersUrl)
+    // const testURL = "https://script.google.com/macros/s/AKfycbzS-2IMbrkG9nLfCdAufVkuZ26uR_gph27Uwr3vMiwEoiN5oPeoeNBctAdrgpTsp4WmWw/exec";
+    initFetcher(inputUsersUrl, token).then(res => {
       setUsersUrlState("検証成功")
       const newForm = { ...forms, "usersDbUrl": inputUsersUrl }
       setForms(newForm)
