@@ -4,12 +4,18 @@ import Lp from './Lp'
 import { memo, useState } from "react";
 import { readMyData } from "../../components/system/readMyData";
 import Link from "next/link"
-import { mapUserData } from "../../firebase/mapUserData";
+import Image from "next/image"
+import App from "../../components/app/app";
 
 export default function Top() {
-  const { user, logout } = useUser()
+  const userData = useUser()
+  const { user, logout } = userData
   if (user) {
-    return <MyPage user={user} logout={logout} />
+    return (
+      <App userData={userData}>
+        <MyPage user={user} logout={logout} />
+      </App>
+    )
   } else return <Lp />
 }
 
@@ -26,33 +32,40 @@ const MyPage = memo(({ user, logout }) => {
       .catch(e => setMyData("failture"))
   }
 
-  const MyEventLibraly = ({ data }) => {
-    console.log(data)
-    return (
-      <>
-        <Join parties={data["participant"]} />
-        <Held events={data["organizer"]} />
-      </>
-    )
-  }
   return (
     <>
-      <MakeQr id={id} />
-      <button onClick={logout}>logout</button>
-      <h2>{name}さんの登録イベント</h2>
-      {
-        !myData ? <p>データ取得中</p> :
-          myData === "no-data" ? <p>イベントが登録されていません</p> :
-            myData === "failture" ? <p>イベント取得に失敗しました</p> :
-              <MyEventLibraly data={myData} />
-      }
-      <Link href="/event/registration"><a>イベントを主催する</a></Link>
+      <div className="container mx-auto font-ui-monospace">
+        <MakeQr id={id} />
+        <button onClick={logout}>logout</button>
+
+        <div className="md:box-content bg-gray-100 p-4">
+          <h2 className="text-purple-600">{name}さんの登録イベント</h2>
+          {
+            !myData ? <p>データ取得中</p> :
+              myData === "no-data" ? <p>イベントが登録されていません</p> :
+                myData === "failture" ? <p>イベント取得に失敗しました</p> :
+                  <MyEventLibraly data={myData} />
+          }
+        </div>
+
+        <Link href="/event/registration"><a className="text-green-900">イベントを主催する</a></Link>
+      </div>
     </>
   )
 
 }
   , (prevProps, nextProps) => prevProps.user.id === nextProps.user.id
 )
+
+const MyEventLibraly = ({ data }) => {
+  console.log(data)
+  return (
+    <>
+      <Held events={data["organizer"]} />
+      <Join parties={data["participant"]} />
+    </>
+  )
+}
 
 
 const Join = ({ parties }) => {
@@ -75,9 +88,14 @@ const Join = ({ parties }) => {
     )
   }
   return (
-    <div>
-      <h3>参加イベント</h3>
+    <div className="flex flex-row">
+      <div className="flex flex-col">
+        {/* <div><Image src="/../../public/icon/walk.png" layout="fill" /></div> */}
+        <div className="mx-auto"><Image src="/icon/walk.png" width={50} height={50} /></div>
+        <div className="mx-auto"><h3>JOIN</h3></div>
+      </div>
       {parties.map(Party)}
+
     </div>
   )
 }
@@ -91,7 +109,7 @@ const Held = ({ events }) => {
     const fullPath = "organizer/" + path
     const joinPath = "events/" + path
     return (
-      <div key={i}>
+      <div key={i} className="box-border md:box-content p-4 border-4">
         <p>
           <Link href={fullPath} ><a>{eventName}</a></Link>
           {" "}
@@ -101,7 +119,7 @@ const Held = ({ events }) => {
     )
   }
   return (
-    <div>
+    <div className="flex flex-col">
       <h3>主催イベント</h3>
       {events.map(Event)}
     </div>
