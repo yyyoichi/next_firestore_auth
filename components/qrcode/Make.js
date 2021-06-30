@@ -1,5 +1,6 @@
 import QRCode from "qrcode.react"
 import { memo, useEffect, useState } from "react";
+import Image from "next/image"
 
 const MakeQr = memo(
   ({ id }) => {
@@ -18,14 +19,17 @@ const MakeQr = memo(
 
     return (
       <>
-        <div className="qr-box">
-          <QRCode className="qrcode" value={qr} size={300} />
+        <QRCode className="mx-auto my-5" value={qr} size={250} />
+        <div className="flex flex-row my-10 justify-center">
+          <div onClick={updataQr}>
+            <Image src="/icon/reload.png" width={13} height={13} />
+          </div>
+          <div className="pl-2"  onClick={updataQr}>更新</div>
         </div>
-        <button className="update-qr" onClick={updataQr} >更新</button>
       </>
     )
   }
-,(prevProps, nextProps) => prevProps.id === nextProps.id
+  , (prevProps, nextProps) => prevProps.id === nextProps.id
 )
 
 export default MakeQr

@@ -34,22 +34,20 @@ const MyPage = memo(({ user, logout }) => {
 
   return (
     <>
-      <div className="container mx-auto font-ui-monospace">
-        <MakeQr id={id} />
-        <button onClick={logout}>logout</button>
-
-        <div className="md:box-content bg-gray-100 p-4">
-          <h2 className="text-purple-600">{name}さんの登録イベント</h2>
-          {
-            !myData ? <p>データ取得中</p> :
-              myData === "no-data" ? <p>イベントが登録されていません</p> :
-                myData === "failture" ? <p>イベント取得に失敗しました</p> :
-                  <MyEventLibraly data={myData} />
-          }
-        </div>
-
-        <Link href="/event/registration"><a className="text-green-900">イベントを主催する</a></Link>
+      <MakeQr id={id} />
+      <div className="bg-gray-100 p-4">
+        {/* <h2 className="text-purple-600">{name}さxんの登録イベント</h2> */}
+        {
+          !myData ? <p>データ取得中</p> :
+            myData === "no-data" ? <p>イベントが登録されていません</p> :
+              myData === "failture" ? <p>イベント取得に失敗しました</p> :
+                <MyEventLibraly data={myData} />
+        }
       </div>
+      <PartyBox>
+        <Join data={myData} />
+      </PartyBox>
+      <Link href="/event/registration"><a className="text-green-900">イベントを主催する</a></Link>
     </>
   )
 
@@ -67,38 +65,57 @@ const MyEventLibraly = ({ data }) => {
   )
 }
 
-
-const Join = ({ parties }) => {
-  if (!parties) return <></>
-  /**
-   * @param {String} party.eventName
-   * @param {String} party.state
-   * @param {String} party.path} party 
-   */
-  const Party = (party, i) => {
-    const { eventName, state, path } = party
-    const status = state === "process" ? "申請中" :
-      state === "yes" ? "参加" : "参加不許可"
-    const fullPath = "events/" + path
-    return (
-      <div key={i}>
-        <p><span>{status}</span>{" "}
-          <Link href={fullPath}><a>{eventName}</a></Link></p>
-      </div>
-    )
-  }
+const PartyBox = ({ children }) => {
   return (
-    <div className="flex flex-row">
-      <div className="flex flex-col">
-        {/* <div><Image src="/../../public/icon/walk.png" layout="fill" /></div> */}
-        <div className="mx-auto"><Image src="/icon/walk.png" width={50} height={50} /></div>
-        <div className="mx-auto"><h3>JOIN</h3></div>
+    <div className="flex flex-col relative my-10 pt-10 pb-10 bg-ggray rounded-t-xl">
+      <div className="absolute w-20 h-20 left-1/2 transform -translate-x-1/2 -top-6 pt-3 pl-4 rounded-full bg-gray-200">
+        <Image src="/icon/walk.png" width={48} height={48} className="" />
       </div>
-      {parties.map(Party)}
-
+      <div className="pt-6 mb-3 w-2/3 border-b mx-auto text-xl text-center">参加</div>
+      <div className="flex flex-col">
+        {children}
+      </div>
     </div>
   )
 }
+
+const Join = memo(
+  ({ data }) => {
+    if (!data) return <div>イベント取得中です</div>
+    if (data === "no-data") return <div className="w-2/3 mx-auto text-center">参加予定のイベントがありません</div>
+    if (data === "failture") return <div>イベント取得に失敗しました</div>
+    /**
+     * @param {String} party.eventName
+     * @param {String} party.state
+     * @param {String} party.path} party 
+     */
+    const Party = (party, i) => {
+      const { eventName, state, path } = party
+
+      const status = state === "process" ? "申請中" :
+        state === "yes" ? "参加" : "参加不許可"
+      const fullPath = "events/" + path
+      return (
+        <div key={i}>
+          <p><span>{status}</span>{" "}
+            <Link href={fullPath}><a>{eventName}</a></Link></p>
+        </div>
+      )
+    }
+    return (
+      <div className="flex flex-row">
+        <div className="flex flex-col">
+          {/* <div><Image src="/../../public/icon/walk.png" layout="fill" /></div> */}
+          <div className="mx-auto"><Image src="/icon/walk.png" width={50} height={50} /></div>
+          <div className="mx-auto"><h3>JOIN</h3></div>
+        </div>
+        {parties.map(Party)}
+
+      </div>
+    )
+  }
+  , (prevProps, nextProps) => prevProps.data === nextProps.data
+)
 
 const Held = ({ events }) => {
   if (!events) return <></>

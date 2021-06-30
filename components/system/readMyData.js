@@ -25,6 +25,8 @@ export const readMyData = async (id) => {
 
   console.log(res)
 
+  if(res["res"] == "no-data") return "no-data"
+
   const { organizer, participant } = res["res"]
 
   /**
