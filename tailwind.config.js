@@ -7,6 +7,9 @@ module.exports = {
         enji: {
           DEFAULT: '#903439'
         },
+        wenji: {
+          DEFAULT: "#907783"
+        },
         rakuda: {
           DEFAULT: '#b19e5c'
         },

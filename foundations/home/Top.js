@@ -39,7 +39,7 @@ const MyPage = memo(({ user, logout }) => {
         <Join data={myData} />
       </Card>
       <Card type="held">
-        <Link href="/event/registration"><a className="text-green-900">イベントを主催する</a></Link>
+        <Held data={myData} />
       </Card>
     </>
   )
@@ -49,8 +49,8 @@ const MyPage = memo(({ user, logout }) => {
 )
 
 const Card = ({ children, type }) => {
-  const color = type==="join" ? "enji" : "rakuda"
-  const src = type==="join" ? "/icon/walk.png" : "/icon/held.png"
+  const color = type === "join" ? "enji" : "rakuda"
+  const src = type === "join" ? "/icon/walk.png" : "/icon/held.png"
   const className = "flex flex-col relative my-20 pt-16 pb-20 text-white rounded-t-xl shadow-lg bg-" + color
   const roundedClass = "absolute w-20 h-20 left-1/2 transform -translate-x-1/2 -top-6 pt-1.5 pl-2 rounded-full bg-white border-8 border-" + color
   return (
@@ -64,7 +64,7 @@ const Card = ({ children, type }) => {
 }
 
 const TypeHeader = ({ children, type }) => {
-  const text = type === "yes" ? "参加" : type === "no" ? "不参加" : type === "process" ? "参加申込中" : "その他";
+  const text = type === "yes" ? "参加" : type === "no" ? "不参加" : type === "process" ? "参加申込中" : "主催イベント";
   return (
     <>
       <div className="pt-6 mb-3 w-3/4 mx-auto text-xl text-center border-b-2 border-gray-50 rounded-b-sm">{text}</div>
@@ -75,11 +75,14 @@ const TypeHeader = ({ children, type }) => {
   )
 }
 
+const cellClass = "flex flex-row w-3/5 mx-auto my-2 px-4 py-1 text-lg text-center border-b border-gray-50 rounded-b-sm"
+const tempCellClass = "w-3/5 mx-auto my-10 px-4 py-1 text-lg text-center border-b border-gray-50 rounded-b-sm"
+
 const Join = memo(
   ({ data }) => {
-    if (!data) return <div className="w-7/8 mx-auto mt-4 px-4 border-b-2 border-gray-50 rounded-b-sm text-center">イベント取得中です</div>
-    if (data === "no-data") return <div className="w-7/8 mx-auto mt-4 px-4 border-b-2 border-gray-50 rounded-b-sm text-center">参加予定のイベントがありません</div>
-    if (data === "failture") return <div className="w-7/8 mx-auto mt-4 px-4 border-b-2 border-gray-50 rounded-b-sm text-center">イベント取得に失敗しました</div>
+    if (!data) return <div className={cellClass}>イベント取得中です</div>
+    if (data === "no-data") return <div className={cellClass}>参加予定のイベントがありません</div>
+    if (data === "failture") return <div className={cellClass}>イベント取得に失敗しました</div>
 
     const Party = ({ party, type }) => {
       if (!party.length) return <></>
@@ -90,10 +93,10 @@ const Join = memo(
             party.map((x, i) => {
               const { eventName, path } = x
               return (
-                <div key={i} className="flex flex-row w-3/5 mx-auto my-2 px-4 py-1 text-lg text-center border-b border-gray-50 rounded-b-sm">
+                <div key={i} className={cellClass}>
                   <Link href={path}><a className="block w-full">{eventName}</a></Link>
-                  <div className="rounded-full bg-gray-50 w-7 h-7 ml-auto">
-                    <Image className="" src="/icon/right.png" width={15} height={15} />
+                  <div className="rounded-full bg-white w-7 h-7 ml-auto">
+                    <Image className="" src="/icon/right2.png" width={15} height={15} />
                   </div>
                 </div>
               )
@@ -128,28 +131,43 @@ const Join = memo(
   , (prevProps, nextProps) => prevProps.data === nextProps.data
 )
 
-const Held = ({ events }) => {
-  if (!events) return <></>
+const Held = memo(
+  ({ data }) => {
+    if (!data) return <div className={tempCellClass}>イベント取得中です</div>
+    if (data === "no-data" || !data["organizer"].length) {
+      return (
+        <div className={tempCellClass}>
+          <Link href="/event/registration"><a className={tempCellClass}>イベントを作成する</a></Link>
+        </div>
+      )
+    }
+    if (data === "failture") return <div className={tempCellClass}>イベント取得に失敗しました</div>
 
-  const Event = (eventProp, i) => {
 
-    const { path, eventName } = eventProp
-    const fullPath = "organizer/" + path
-    const joinPath = "events/" + path
+    const Event = (eventProp, i) => {
+
+      const { path, eventName } = eventProp
+      const fullPath = "organizer/" + path
+      // const joinPath = "events/" + path
+      return (
+        <div key={i} className={cellClass}>
+          <Link href={fullPath}><a className="block w-full">{eventName}</a></Link>
+          <div className="rounded-full bg-white w-7 h-7 ml-auto">
+            <Image className="" src="/icon/right2.png" width={15} height={15} />
+          </div>
+        </div>
+      )
+    }
     return (
-      <div key={i} className="box-border md:box-content p-4 border-4">
-        <p>
-          <Link href={fullPath} ><a>{eventName}</a></Link>
-          {" "}
-          <Link href={joinPath}><a>参加者募集ページ</a></Link>
-        </p>
-      </div>
+      <TypeHeader type="held">
+        {
+          data["organizer"].map(Event)
+        }
+        <div className={tempCellClass}>
+          <Link href="/event/registration"><a className="">イベントを作成する</a></Link>
+        </div>
+      </TypeHeader>
     )
   }
-  return (
-    <div className="flex flex-col">
-      <h3>主催イベント</h3>
-      {events.map(Event)}
-    </div>
-  )
-}
+  , (prevProps, nextProps) => prevProps.data === nextProps.data
+)
