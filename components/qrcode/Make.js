@@ -19,7 +19,7 @@ const MakeQr = memo(
 
     return (
       <>
-        <QRCode className="mx-auto my-5" value={qr} size={250} />
+        <QRCode className="mx-auto my-10" value={qr} size={250} />
         <div className="flex flex-row my-10 justify-center">
           <div onClick={updataQr}>
             <Image src="/icon/reload.png" width={13} height={13} />

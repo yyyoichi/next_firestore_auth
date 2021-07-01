@@ -10,7 +10,6 @@ import { getMyFromCookie, removeMyCookie, setMyCookie } from "./myCookie"
  * 
  */
 export const readMyData = async (id) => {
-  removeMyCookie()
   const myDataFromCookie = getMyFromCookie()
   if (myDataFromCookie) {
     console.log("cookie!!")

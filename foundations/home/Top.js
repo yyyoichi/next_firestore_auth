@@ -35,19 +35,12 @@ const MyPage = memo(({ user, logout }) => {
   return (
     <>
       <MakeQr id={id} />
-      <div className="bg-gray-100 p-4">
-        {/* <h2 className="text-purple-600">{name}さxんの登録イベント</h2> */}
-        {
-          !myData ? <p>データ取得中</p> :
-            myData === "no-data" ? <p>イベントが登録されていません</p> :
-              myData === "failture" ? <p>イベント取得に失敗しました</p> :
-                <MyEventLibraly data={myData} />
-        }
-      </div>
-      <PartyBox>
+      <Card type="join">
         <Join data={myData} />
-      </PartyBox>
-      <Link href="/event/registration"><a className="text-green-900">イベントを主催する</a></Link>
+      </Card>
+      <Card type="held">
+        <Link href="/event/registration"><a className="text-green-900">イベントを主催する</a></Link>
+      </Card>
     </>
   )
 
@@ -55,63 +48,81 @@ const MyPage = memo(({ user, logout }) => {
   , (prevProps, nextProps) => prevProps.user.id === nextProps.user.id
 )
 
-const MyEventLibraly = ({ data }) => {
-  console.log(data)
+const Card = ({ children, type }) => {
+  const color = type==="join" ? "enji" : "rakuda"
+  const src = type==="join" ? "/icon/walk.png" : "/icon/held.png"
+  const className = "flex flex-col relative my-20 pt-16 pb-20 text-white rounded-t-xl shadow-lg bg-" + color
+  const roundedClass = "absolute w-20 h-20 left-1/2 transform -translate-x-1/2 -top-6 pt-1.5 pl-2 rounded-full bg-white border-8 border-" + color
   return (
-    <>
-      <Held events={data["organizer"]} />
-      <Join parties={data["participant"]} />
-    </>
+    <div className={className}>
+      <div className={roundedClass}>
+        <Image src={src} width={48} height={48} className="" />
+      </div>
+      {children}
+    </div>
   )
 }
 
-const PartyBox = ({ children }) => {
+const TypeHeader = ({ children, type }) => {
+  const text = type === "yes" ? "参加" : type === "no" ? "不参加" : type === "process" ? "参加申込中" : "その他";
   return (
-    <div className="flex flex-col relative my-10 pt-10 pb-10 bg-ggray rounded-t-xl">
-      <div className="absolute w-20 h-20 left-1/2 transform -translate-x-1/2 -top-6 pt-3 pl-4 rounded-full bg-gray-200">
-        <Image src="/icon/walk.png" width={48} height={48} className="" />
-      </div>
-      <div className="pt-6 mb-3 w-2/3 border-b mx-auto text-xl text-center">参加</div>
-      <div className="flex flex-col">
+    <>
+      <div className="pt-6 mb-3 w-3/4 mx-auto text-xl text-center border-b-2 border-gray-50 rounded-b-sm">{text}</div>
+      <div className="flex flex-col text-gray-50">
         {children}
       </div>
-    </div>
+    </>
   )
 }
 
 const Join = memo(
   ({ data }) => {
-    if (!data) return <div>イベント取得中です</div>
-    if (data === "no-data") return <div className="w-2/3 mx-auto text-center">参加予定のイベントがありません</div>
-    if (data === "failture") return <div>イベント取得に失敗しました</div>
-    /**
-     * @param {String} party.eventName
-     * @param {String} party.state
-     * @param {String} party.path} party 
-     */
-    const Party = (party, i) => {
-      const { eventName, state, path } = party
+    if (!data) return <div className="w-7/8 mx-auto mt-4 px-4 border-b-2 border-gray-50 rounded-b-sm text-center">イベント取得中です</div>
+    if (data === "no-data") return <div className="w-7/8 mx-auto mt-4 px-4 border-b-2 border-gray-50 rounded-b-sm text-center">参加予定のイベントがありません</div>
+    if (data === "failture") return <div className="w-7/8 mx-auto mt-4 px-4 border-b-2 border-gray-50 rounded-b-sm text-center">イベント取得に失敗しました</div>
 
-      const status = state === "process" ? "申請中" :
-        state === "yes" ? "参加" : "参加不許可"
-      const fullPath = "events/" + path
+    const Party = ({ party, type }) => {
+      if (!party.length) return <></>
+
       return (
-        <div key={i}>
-          <p><span>{status}</span>{" "}
-            <Link href={fullPath}><a>{eventName}</a></Link></p>
-        </div>
+        <TypeHeader type={type}>
+          {
+            party.map((x, i) => {
+              const { eventName, path } = x
+              return (
+                <div key={i} className="flex flex-row w-3/5 mx-auto my-2 px-4 py-1 text-lg text-center border-b border-gray-50 rounded-b-sm">
+                  <Link href={path}><a className="block w-full">{eventName}</a></Link>
+                  <div className="rounded-full bg-gray-50 w-7 h-7 ml-auto">
+                    <Image className="" src="/icon/right.png" width={15} height={15} />
+                  </div>
+                </div>
+              )
+            })
+          }
+        </TypeHeader>
       )
     }
+    /**
+     * @type {Array{}}
+     */
+    const participant = data["participant"]
+    let process = []
+    let yes = []
+    let no = []
+    let reject = []
+    let parties = { process, yes, no, reject }
+    for (let i = 0; i < participant.length; i++) {
+      let p = participant[i]
+      let { state, eventName } = p
+      let path = "events/" + p["path"]
+      parties[state].push({ eventName, path })
+    }
     return (
-      <div className="flex flex-row">
-        <div className="flex flex-col">
-          {/* <div><Image src="/../../public/icon/walk.png" layout="fill" /></div> */}
-          <div className="mx-auto"><Image src="/icon/walk.png" width={50} height={50} /></div>
-          <div className="mx-auto"><h3>JOIN</h3></div>
-        </div>
-        {parties.map(Party)}
-
-      </div>
+      <>
+        <Party party={parties["yes"]} type="yes" />
+        <Party party={parties["process"]} type="process" />
+        <Party party={parties["no"]} type="no" />
+      </>
     )
   }
   , (prevProps, nextProps) => prevProps.data === nextProps.data

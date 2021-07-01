@@ -17,6 +17,7 @@ export default function Page({ data }) {
     setSubmitState("set")
     readMyData(user["id"])
       .then(res => {
+        if(res === "no-data") return setThisEventState("noApply")
         /**
          * @type {array}
          */
