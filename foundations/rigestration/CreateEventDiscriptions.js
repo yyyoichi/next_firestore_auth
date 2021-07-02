@@ -1,4 +1,4 @@
-export default function Discriptions() {
+export default function CreateEventDiscriptions() {
   return (
     <>
       <h1>イベントの作成</h1>

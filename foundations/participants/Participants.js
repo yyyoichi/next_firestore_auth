@@ -7,6 +7,7 @@ import { fetcher } from "../../components/system/Fetcher";
 import { readMyData } from "../../components/system/readMyData";
 import Token from "../../components/system/Token";
 import EnjiButton from "../../components/app/material/EnjiButton";
+import { UserStateUiBox, FormHeader } from "../../components/app/material/UserStateUi";
 
 export default function Participants({ data }) {
   const userData = useUser(false)
@@ -20,7 +21,7 @@ export default function Participants({ data }) {
     readMyData(user["id"])
       .then(res => {
         console.log(res)
-        let thisEventState = "canApplay"
+        let thisEventState = "showButton"
         if (res === "no-data") return setUserState(thisEventState)//申込可
         /**
          * @type {array}
@@ -49,13 +50,12 @@ export default function Participants({ data }) {
     <>
       <App userData={userData}>
         <EventInfo data={data["eventData"]} />
-
-        <div className="w-3/4 flex justify-center mx-auto">
+        <UserStateUiBox>
           <UserStateUi
             userState={userState}
             setUserState={setUserState}
           />
-        </div>
+        </UserStateUiBox>
 
         {
           userState === "open" ?
@@ -80,7 +80,7 @@ const UserStateUi = memo(
     if (userState === "getUserState") {
       return <p>データ取得中です</p>
     }
-    if (userState === "canApplay") {
+    if (userState === "showButton") {
       const onClick = () => setUserState("open")
       return <EnjiButton onClick={onClick}>申し込む</EnjiButton>
     }
@@ -94,16 +94,11 @@ const UserStateUi = memo(
       return <p>申込中です</p>
     }
     if (userState === "open") {
-      return (
-        <>
-          <h3 className="pt-2 px-4 border-b border-enji align-text-bottom mx-auto">参加申し込み</h3>
-          <p className="text-sm p-2 ml-auto" onClick={() => setUserState("canApplay")}>×</p>
-        </>
-      )
+      return <FormHeader setUserState={setUserState} titleText="参加申込"/>
     }
     return (
       <p>{userState}</p>
     )
   }
-  // , (prevProps, nextProps) => prevProps.userState === nextProps.userState
+  , (prevProps, nextProps) => prevProps.userState === nextProps.userState
 )

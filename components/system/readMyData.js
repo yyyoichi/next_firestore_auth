@@ -38,6 +38,9 @@ export const readMyData = async (id) => {
     const keys = Object.keys(object)
     if (!keys.length) return []
     return keys.reduce((array, x) => {
+      /**
+       * @type {objct} obj
+       */
       const obj = { ...object[x], [propertyKey]: x }
       return [...array, obj]
     }, []);
