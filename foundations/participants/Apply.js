@@ -1,44 +1,16 @@
 import { memo, useState } from "react";
+import EnjiButton from "../../components/app/material/EnjiButton";
 import { fetcher } from "../../components/system/Fetcher";
+import { removeMyCookie } from "../../components/system/myCookie";
 import { readMyData } from "../../components/system/readMyData";
 import Token from "../../components/system/Token";
 import { useUser } from "../../firebase/useUser";
 
-export default function Page({ data }) {
-  console.log(data)
-  const { user, logout } = useUser(false)
+export default function Page({ data, user, onSended }) {
   const { registrationItems, participantUrl, key, eventId, eventName } = data
   const access_token = Token()
-  const [thisEventState, setThisEventState] = useState("")
-  const [submitState, setSubmitState] = useState("start")
+  const [submitState, setSubmitState] = useState("ok")
   const [forms, setForms] = useState([])
-
-  if (user && submitState === "start") {
-    setSubmitState("set")
-    readMyData(user["id"])
-      .then(res => {
-        if(res === "no-data") return setThisEventState("noApply")
-        /**
-         * @type {array}
-         */
-        const join = res["participant"]
-        let thisEvent = "noApply";
-        if (!join.length) return setThisEventState(thisEvent)
-        const path = eventId + "/" + key
-        for (let i = 0; i < join.length; i++) {
-          const x = join[i]
-          if (x["path"] === path) {
-            thisEvent = x
-            break
-          }
-        }
-        setThisEventState(thisEvent)
-      })
-      .catch(e => {
-        console.log(e)
-        setThisEventState("failture")
-      })
-  }
 
   const handleChange = (e) => {
     const target = e.target
@@ -54,9 +26,11 @@ export default function Page({ data }) {
 
   const eventRegister = (event) => {
     event.preventDefault()
-    fetcher(participantUrl, { forms, access_token, type: "addUser", id: user["id"] })
+    // return console.log("send!!")
+    setSubmitState("sending")
+    fetcher(participantUrl, { forms, access_token, type: "addUser", id: user["id"] })//個別データに保存
       .then(res => {
-        console.log(res)
+        // console.log(res)
         const url = process.env.NEXT_PUBLIC_USER_DATABASE_URL
         const token = process.env.NEXT_PUBLIC_GAS_API_KEY
         const data = {
@@ -69,66 +43,82 @@ export default function Page({ data }) {
         }
         return fetcher(url, data)
       })
+      .then(res => {
+        setSubmitState("sended")
+        setTimeout(onSended, 500)
+        removeMyCookie()
+      })
       .catch(e => {
         alert(e)
         console.log(e)
       })
   }
 
+
   const createUi = ({ type }, i) => {
     // const formName = `index${i}`
+    const inputClass = "border-2 rounded-sm"
     if (type === "input") {
-      return <input type="text" name={i} value={forms[i]} onChange={handleChange} required />
+      return (
+        <input
+          className={inputClass}
+          type="text"
+          name={i}
+          value={forms[i]}
+          onChange={handleChange}
+          required
+        />
+      )
     } else if (type === "textarea") {
-      return <textarea name={i} value={forms[i]} onChange={handleChange} required />
+      return (
+        <textarea
+          className={inputClass}
+          name={i}
+          value={forms[i]}
+          onChange={handleChange}
+          required
+        />
+      )
     }
   }
 
-
-
-
-  if (!user) {
-    return <p>ログインするとイベント参加申請ができます。</p>
-  }
-  if (!thisEventState) {
-    return <p>イベント参加状況を問い合わせ中</p>
-  }
-  
-  if (thisEventState !== "noApply") {//GASにデータ在り
-    const state = thisEventState["state"]
-    const statusMessage = state === "process" ? "すでに参加を申請しています" :
-      state === "yes" ? "参加が決定しています" : "残念ながら不参加となりました"
-    return <p>{statusMessage}</p>
-  }
-  // if (thisEventState === "noApply") {
-
   return (
     <>
-      <h2>参加申請</h2>
       <form
         onSubmit={eventRegister}
+        className="block w-3/4 mx-auto"
       >
-        {registrationItems.map((item, i) => {
-          console.log(item)
-          const { header } = item
-          return (
-            <div key={i}>
-              <label>{header}:</label>{createUi(item, i)}
-            </div>
-          )
-        })
+        {
+          registrationItems.map((item, i) => {
+            return (
+              <div
+                className="flex flex-col my-3"
+                key={i}
+              >
+                <div className="py-2 pl-1">{item["header"]}</div>
+                {createUi(item, i)}
+              </div>
+            )
+          })
         }
-        <button type="submit">Register</button>
+        <div className="flex mx-auto justify-center my-4">
+          {
+            submitState === "ok" ?
+              (
+                <EnjiButton type="submit">登録</EnjiButton>
+              ) :
+              submitState === "sending" ?
+                (
+                  <p>送信中</p>
+                ) :
+                (<>
+                  <p>送信完了</p>
+                </>
+                )
+          }
+        </div>
       </form>
     </>
   )
 }
-
-const Apply = memo(
-  ({ user, registrationItems }) => {
-
-
-  }
-
-)
 

@@ -12,6 +12,6 @@ export async function getServerSideProps(context) {
   const type = "getEvent"
   
   const res = await fetcher(url, {token, type, key, eventId})
-  console.log(res)
+  // console.log(res)
   return {props: res["data"]}
 }

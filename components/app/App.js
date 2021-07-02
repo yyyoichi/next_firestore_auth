@@ -2,6 +2,7 @@
 import Header from "./Header"
 import Footer from "./Footer"
 const App = (props) => {
+  console.log("app^render")
   const userData = props.userData
   return (
     <>
