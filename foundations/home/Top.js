@@ -12,7 +12,7 @@ export default function Top() {
   const { user, logout } = userData
   if (user) {
     return (
-      <App userData={userData}>
+      <App userData={userData} type="sp">
         <MyPage user={user} logout={logout} />
       </App>
     )

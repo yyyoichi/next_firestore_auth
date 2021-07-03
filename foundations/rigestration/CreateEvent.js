@@ -6,7 +6,8 @@ import { removeMyCookie } from "../../components/system/myCookie"
 import Token from "../../components/system/Token"
 import User from "./User"
 import Gates from "./Gates"
-
+import EnjiButton from "../../components/app/material/EnjiButton"
+import formClasses from "../../components/app/formClasses"
 /**
  * 
  * @param {array} heldEventsId
@@ -124,34 +125,112 @@ const CreateEvent = ({ user, heldEventsId }) => {
           .catch(e => alert(e))
       })
   }
+  const { blockClass, headerClass, boxClass, labelClass, discClass, inputClass } = formClasses("pc")
+
 
   return (
-    <>
-      {/* テスト */}
-      <input type="button" value="test" onClick={eventRegister} />
-      {submitState}
-
-      <h2>イベント登録</h2>
-      <form
-        onSubmit={eventRegister}
-      >
-        <h3>イベント情報</h3>
-        <label htmlFor="eventId">イベントID</label>
-        <input id="eventId" name="eventId" type="text" defaultValue={forms.eventId} onChange={handleChange} required />
-        <label htmlFor="eventName">イベント名</label>
-        <input id="eventName" name="eventName" type="text" value={forms.eventName} onChange={handleChange} required />
-        <label htmlFor="page">イベントURL</label>
-        <input id="page" name="page" type="url" value={forms.page} onChange={handleChange} required />
-        <label htmlFor="organizer">イベント主催者</label>
-        <input id="organizer" name="organizer" type="text" value={forms.organizer} onChange={handleChange} required />
-        <label htmlFor="email">問い合わせメールアドレス</label>
-        <input id="email" name="email" type="mail" value={forms.email} onChange={handleChange} required />
-        <label htmlFor="start">イベント開始日時</label>
-        <input id="start" name="start" type="datetime-local" value={forms.start} onChange={handleChange} required />
-        <label htmlFor="end">イベント終了日時</label>
-        <input id="end" name="end" type="datetime-local" value={forms.end} onChange={handleChange} required />
-        <label htmlFor="discription">イベント説明</label>
-        <textarea id="discription" name="discription" type="datetime-local" rows="10" cols="90" value={forms.discription} onChange={handleChange} required />
+    <div className="w-3/4 mx-auto">
+      <form onSubmit={eventRegister}>
+        <div className={blockClass}>
+          <h3 className={headerClass}>イベント情報</h3>
+          <div className={boxClass}>
+            <label htmlFor="eventId" className={labelClass}>イベントID</label>
+            <p className={discClass}>URLに使用されます。アカウント内で同じIDを使用することはできません。</p>
+            <input
+              id="eventId"
+              className={inputClass}
+              name="eventId"
+              type="text"
+              defaultValue={forms.eventId}
+              onChange={handleChange}
+              required />
+          </div>
+          <div className={boxClass}>
+            <label htmlFor="eventName" className={labelClass}>イベント名</label>
+            <p className={discClass}>参加者や参加検討者に表示されます。</p>
+            <input
+              id="eventName"
+              className={inputClass}
+              name="eventName"
+              type="text"
+              value={forms.eventName}
+              onChange={handleChange}
+              required />
+          </div>
+          <div className={boxClass}>
+            <label htmlFor="page">イベントURL</label>
+            <p className={discClass}>イベントに関係するWebサイトやSNSアカウントのURLを入力してください。</p>
+            <input
+              id="page"
+              className={inputClass}
+              name="page"
+              type="url"
+              value={forms.page}
+              onChange={handleChange}
+              required />
+          </div>
+          <div className={boxClass}>
+            <label htmlFor="organizer">イベント主催者</label>
+            <p className={discClass}>イベントを主催する団体名、個人名を入力してください。</p>
+            <input
+              id="organizer"
+              className={inputClass}
+              name="organizer"
+              type="text"
+              value={forms.organizer}
+              onChange={handleChange}
+              required />
+          </div>
+          <div className={boxClass}>
+            <label htmlFor="email">問い合わせメールアドレス</label>
+            <p className={discClass}>問い合わせを受けることのできるメールアドレスを入力してください。</p>
+            <input
+              id="email"
+              className={inputClass}
+              name="email"
+              type="mail"
+              value={forms.email}
+              onChange={handleChange}
+              required />
+          </div>
+          <div className={boxClass}>
+            <label htmlFor="start">イベント開始日時</label>
+            <p className={discClass}>イベントの開始日時を入力して下さい。</p>
+            <input
+              id="start"
+              className={inputClass}
+              name="start"
+              type="datetime-local"
+              value={forms.start}
+              onChange={handleChange}
+              required />
+          </div>
+          <div className={boxClass}>
+            <label htmlFor="end">イベント終了日時</label>
+            <p className={discClass}>イベントの終了日時を入力してください。</p>
+            <input
+              id="end"
+              className={inputClass}
+              name="end"
+              type="datetime-local"
+              value={forms.end}
+              onChange={handleChange}
+              required />
+          </div>
+          <div className={boxClass}>
+            <label htmlFor="discription">イベント紹介</label>
+            <p className={discClass}>イベントの概要や注意事項等あれば記入して下さい。</p>
+            <textarea
+              id="discription"
+              className={inputClass}
+              name="discription"
+              type="datetime-local"
+              value={forms.discription}
+              onChange={handleChange}
+              rows="10"
+              required />
+          </div>
+        </div>
         <User
           forms={forms}
           setForms={setForms}
@@ -163,9 +242,9 @@ const CreateEvent = ({ user, heldEventsId }) => {
           handleChange={handleChange}
           token={token}
         />
-        <button type="submit">Register</button>
+        <EnjiButton type="submit">登録</EnjiButton>
       </form>
-    </>
+    </div>
   )
 }
 

@@ -1,16 +1,16 @@
-import { memo, useState } from "react";
+import { useState } from "react";
 import EnjiButton from "../../components/app/material/EnjiButton";
 import { fetcher } from "../../components/system/Fetcher";
 import { removeMyCookie } from "../../components/system/myCookie";
-import { readMyData } from "../../components/system/readMyData";
 import Token from "../../components/system/Token";
-import { useUser } from "../../firebase/useUser";
+import formClasses from "../../components/app/formClasses";
 
 export default function Page({ data, user, onSended }) {
   const { registrationItems, participantUrl, key, eventId, eventName } = data
   const access_token = Token()
   const [submitState, setSubmitState] = useState("ok")
   const [forms, setForms] = useState([])
+  const { inputClass, labelClass, boxClass } = formClasses("sp")
 
   const handleChange = (e) => {
     const target = e.target
@@ -57,7 +57,6 @@ export default function Page({ data, user, onSended }) {
 
   const createUi = ({ type }, i) => {
     // const formName = `index${i}`
-    const inputClass = "border-2 rounded-sm"
     if (type === "input") {
       return (
         <input
@@ -76,6 +75,7 @@ export default function Page({ data, user, onSended }) {
           name={i}
           value={forms[i]}
           onChange={handleChange}
+          rows="4"
           required
         />
       )
@@ -92,10 +92,10 @@ export default function Page({ data, user, onSended }) {
           registrationItems.map((item, i) => {
             return (
               <div
-                className="flex flex-col my-3"
+                className={boxClass}
                 key={i}
               >
-                <div className="py-2 pl-1">{item["header"]}</div>
+                <label className={labelClass}>{item["header"]}</label>
                 {createUi(item, i)}
               </div>
             )

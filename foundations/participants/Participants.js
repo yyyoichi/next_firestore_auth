@@ -3,9 +3,7 @@ import Apply from "./Apply"
 import App from "../../components/app/app"
 import { useUser } from "../../firebase/useUser"
 import { memo, useState } from "react";
-import { fetcher } from "../../components/system/Fetcher";
 import { readMyData } from "../../components/system/readMyData";
-import Token from "../../components/system/Token";
 import EnjiButton from "../../components/app/material/EnjiButton";
 import { UserStateUiBox, FormHeader } from "../../components/app/material/UserStateUi";
 

@@ -39,8 +39,10 @@ export default function Registration() {
         setUserState("failture")
       })
   }
+  
+  
   return (
-    <App userData={userData}>
+    <App userData={userData} type="pc">
       <CreateEventDiscriptions />
       <UserStateUiBox>
         <UserStateUi userState={userState} setUserState={setUserState} />
