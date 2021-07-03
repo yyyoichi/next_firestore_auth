@@ -2,7 +2,7 @@ import { memo } from 'react'
 import QrReader from 'react-qr-scanner'
 
 const ReadQr = memo(
-  ({ handleScan, open }) => {
+  ({ handleScan }) => {
     const previewStyle = {
       height: 240,
       width: 320,
@@ -14,16 +14,12 @@ const ReadQr = memo(
     // console.log("reanderQRreader")
     // const delay = delayQr ? 500 : false
     return (
-      <div className="qr-reader">
-        {!open ? <></> :
-          <QrReader
-            delay={delay}
-            style={previewStyle}
-            onError={handleError}
-            onScan={handleScan}
-          />
-        }
-      </div>
+      <QrReader
+        delay={delay}
+        style={previewStyle}
+        onError={handleError}
+        onScan={handleScan}
+      />
     )
   },
   // (prevProps, nextProps) => prevProps.open === nextProps.open

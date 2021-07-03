@@ -1,7 +1,9 @@
 // import { Html } from "next/document"
 import Header from "./Header"
 import Footer from "./Footer"
-const App = (props) => {
+import { memo } from "react"
+const App = memo(
+   (props) => {
   // console.log("app^render")
   const userData = props.userData
   const type = props["type"] || "sp"
@@ -23,5 +25,7 @@ const App = (props) => {
     </>
   )
 }
+, (prevProps, nextProps) => prevProps.userData === nextProps.userData
+)
 
 export default App

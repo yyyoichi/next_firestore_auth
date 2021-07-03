@@ -75,7 +75,7 @@ const UserStateUi = memo(
     }
 
     if (userState === "open") {
-      return <FormHeader setUserState={setUserState} titleText="イベント作成" />
+      return <FormHeader setState={setUserState} titleText="イベント作成" />
     }
     return (
       <p>{userState}</p>

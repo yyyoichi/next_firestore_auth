@@ -10,7 +10,7 @@ export default function Page({ data, user, onSended }) {
   const access_token = Token()
   const [submitState, setSubmitState] = useState("ok")
   const [forms, setForms] = useState([])
-  const { inputClass, labelClass, boxClass } = formClasses("sp")
+  const {formClass, inputClass, labelClass, boxClass } = formClasses("sp")
 
   const handleChange = (e) => {
     const target = e.target
@@ -86,7 +86,7 @@ export default function Page({ data, user, onSended }) {
     <>
       <form
         onSubmit={eventRegister}
-        className="block w-3/4 mx-auto"
+        className={formClass}
       >
         {
           registrationItems.map((item, i) => {

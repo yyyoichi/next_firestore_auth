@@ -3,35 +3,51 @@ import { memo, useState } from "react";
 import { fetcher, getUsersDbViaFireStore } from "../../components/system/Fetcher";
 import { useUser } from "../../firebase/useUser";
 import ReadQr from "../../components/qrcode/Reader";
+import App from "../../components/app/app";
+import formClasses from "../../components/app/formClasses";
+import EnjiButton from "../../components/app/material/EnjiButton";
+import { FormHeader, UserStateUiBox as QrStateUiBox } from "../../components/app/material/UserStateUi";
+import GrayButton from "../../components/app/material/GrayButton";
+import QrBox from "./QrBox";
 
 export default function OrganizerHome() {
   const router = useRouter()
   const { key, eventid } = router.query
-  const { user, logout } = useUser()
+  const userData = useUser()
+  const { user } = userData
 
-  const [dbData, setDbData] = useState(null)//firestoreに保存されているデータ
+  const [privateEventData, setPrivateEventData] = useState(null)//firestoreに保存されているデータ
   const [usersData, setUsersData] = useState({})
   //Qr記録先のgateURLと入退のいずれか
   const [qrAccessBasics, setQrAccessBasics] = useState({ "gateUrl": "", "gateType": "" })
   const [submitState, setSubmitState] = useState("start")
+  const [qrState, setQrState] = useState("setup")
+
+  if (user && eventid && qrState === "setup") {
+    setQrState("getQr")
+    const type = "getUsersForReader"
+    getUsersDbViaFireStore(eventid, user["id"], { type })
+      .then(({ resUsersData, resDbData }) => {
+        setPrivateEventData(resDbData)
+        setUsersData(resUsersData)
+        setQrState("showGrayButton")
+      })
+  }
 
   const [openQr, setQr] = useState(false)
 
-
-  const handleClick = (e) => {
+  const onChangeSetting = (e) => {
     console.log("click")
     const name = e.target.name
     const value = e.target.value
-    setQr(false)
     const newBasics = { ...qrAccessBasics, [name]: value }
     setQrAccessBasics(newBasics)
     if (newBasics["gateUrl"] && newBasics["gateType"]) {
-      if (submitState !== "go") setSubmitState("go")
-      setTimeout(()=>{ setQr(true) },1000)
+      if (qrState !== "showButton") setQrState("showButton")
     } else {//未選択項目がある場合
-      setSubmitState("prepair")
-      setQr(false)
+      if (qrState !== "showGrayButton") setQrState("showGrayButton")
     }
+    console.log(qrState)
   }
 
   const testClick = () => {
@@ -39,16 +55,26 @@ export default function OrganizerHome() {
     const userdata = usersData[uid]
     console.log("\ttest_userData")
     console.log(userdata)
-    console.log("admission: "+userdata["admission"])
+    console.log("admission: " + userdata["admission"])
   }
 
   const handleScan = data => {
     if (!data || submitState !== "go") return
 
-    const reOpen = () => {
+    setSubmitState("catching")
+    console.log(data)
+
+
+    const reOpen = (minute = 0) => {
+      if (minute) {
+        return setTimeout(reOpen, minute)
+      }
       setSubmitState("go")
       setQr(true)
     }
+    return reOpen(2000)
+
+
     const handleError = errorType => {
       setTimeout(reOpen, 1000 * 2)
       return setSubmitState(errorType)
@@ -77,7 +103,7 @@ export default function OrganizerHome() {
 
     //時間切れ
     // if (withinTheValidRange) return handleError("timeover")
-  
+
 
     const { state, admission } = userData//
     const { gateType, gateUrl } = qrAccessBasics//選択中のQR読み込み設定
@@ -93,73 +119,86 @@ export default function OrganizerHome() {
     const usersDbUrl = dbData["usersDbUrl"]
     const fetchData = { type, token, gateType, userData }
 
-    Promise.all([fetcher(usersDbUrl, fetchData),fetcher(gateUrl, fetchData)])
-    .then(res => {
-      console.log(res)
-      const newUserData = res[0]["res"]
-      const newUsersData = {...usersData, [uid]: newUserData}
-      console.log("\tnewUserData")
-      console.log(newUsersData[uid])
-      setUsersData(newUsersData)
-      reOpen()
-    })
-    .catch(e => {
-      alert(e)
-      console.error(e)
-    })
+    Promise.all([fetcher(usersDbUrl, fetchData), fetcher(gateUrl, fetchData)])
+      .then(res => {
+        console.log(res)
+        const newUserData = res[0]["res"]
+        const newUsersData = { ...usersData, [uid]: newUserData }
+        console.log("\tnewUserData")
+        console.log(newUsersData[uid])
+        setUsersData(newUsersData)
+        reOpen()
+      })
+      .catch(e => {
+        alert(e)
+        console.error(e)
+      })
 
 
     setTimeout(reOpen, 1000 * 2)
   }
 
-  if (user && eventid && submitState === "start") {
-    setSubmitState("prepair")
-    const type = "getUsersForReader"
-    getUsersDbViaFireStore(eventid, user["id"], { type })
-      .then(({ resUsersData, resDbData }) => {
-        setDbData(resDbData)
-        setUsersData(resUsersData)
-        // setSubmitState("go")
-      })
-  }
-  const qrStateMassage = submitState === "prepair" ? "項目をすべて選択して下さい" :
-    submitState === "go" ? "QR読み込み可能" :
-      submitState === "catching" ? "処理中" :
-        submitState === "timeover" ? "QRコードを更新してください" :
-          submitState === "no-entree" ? "参加者申請がされていません" :
-            submitState === "reject" ? "入退が許可されていません" :
-              submitState === "double" ? "既に記録済みです" :
-                "";
+  const qrStateMassage = submitState === "prepair" ? "データを取得しています" :
+    submitState === "haveData" ? "項目をすべて選択して下さい" :
+      submitState === "go" ? "QR読み込み可能" :
+        submitState === "catching" ? "処理中" :
+          submitState === "timeover" ? "QRコードを更新してください" :
+            submitState === "no-entree" ? "参加者申請がされていません" :
+              submitState === "reject" ? "入退が許可されていません" :
+                submitState === "double" ? "既に記録済みです" :
+                /*start*/"データ収集準備中";
   return (
-
     <>
-      <div>{key}</div>
-      {
-        dbData ?
-          <QrHome data={dbData} handleClick={handleClick} /> :
-          <div>wait...</div>
-      }
-      <ReadQr handleScan={handleScan} open={openQr} />
-      <div>{qrStateMassage}</div>
-      <button onClick={testClick}>button</button>
+      <App userData={userData}>
+        <QrSetting data={privateEventData} handleChange={onChangeSetting} />
+        <QrStateUiBox qrState={qrState}>
+          <QrState qrState={qrState} setQrState={setQrState} />
+        </QrStateUiBox>
+        {
+          qrState === "open" ? <QrBox setQrState={setQrState} /> : <></>
+        }
+
+      </App>
     </>
   )
 }
 
-const QrHome = memo(({ data, handleClick }) => {
-  const {
-    eventName,
-    gatesUrl
-  } = data
+const QrState = memo(
+  ({ qrState, setQrState }) => {
+    if (qrState === "setup") {
+      return <p>準備中</p>
+    }
+    if (qrState === "getQr") {
+      return <p>データ取得中</p>
+    }
+    if (qrState === "showGrayButton") {
+      return <GrayButton>QRリーダーを開く</GrayButton>
+    }
+    if (qrState === "showButton") {
+      return <EnjiButton onClick={() => setQrState("open")}>QRリーダーを開く</EnjiButton>
+    }
+    if (qrState === "open") {
+      return <></>
+    }
+  }
+  , (prevProps, nextProps) => prevProps.qrState === nextProps.qrState
+)
+
+const QrSetting = memo(({ data, handleChange }) => {
+  const { formClass, blockClass, headerClass, boxClass, labelClass, discClass, inputClass, buttonClass }
+    = formClasses()
+  const eventName = data ? data["eventName"] : "取得中"
+  const gatesUrl = data ? data["gatesUrl"] : []
   return (
-    <>
-      <h2>
-        {eventName}
-      </h2>
-      <div>
+    <div className={formClass}>
+      <h2 className={headerClass}>{eventName}</h2>
+      <div className={boxClass}>
+        <p className={discClass}>入退を記録するゲート名と「入」「退」のどちらかを選択して下さい。</p>
+        <label className={labelClass}>入退ゲート</label>
         <select
           name="gateUrl"
-          onChange={(e) => handleClick(e)}
+          className={inputClass}
+          onChange={(e) => handleChange(e)}
         >
           <option value={""}>選択してください</option>
           {
@@ -175,26 +214,29 @@ const QrHome = memo(({ data, handleClick }) => {
             })
           }
         </select>
-        <div>
-          <label>
-            <input
-              type="radio"
-              name="gateType"
-              value="enter"
-              onChange={(e) => handleClick(e)}
-            />
-            入</label>
-          <label>
-            <input
-              type="radio"
-              name="gateType"
-              value="exit"
-              onChange={(e) => handleClick(e)}
-            />
-            出</label>
-        </div>
       </div>
-    </>
+      <div className={boxClass}>
+        <label>
+          <input
+            type="radio"
+            name="gateType"
+            value="enter"
+            onChange={(e) => handleChange(e)}
+          />
+          入</label>
+      </div>
+      <div className={boxClass}>
+        <label>
+          <input
+            type="radio"
+            name="gateType"
+            value="exit"
+            onChange={(e) => handleChange(e)}
+          />
+          出</label>
+      </div>
+    </div>
   )
-},
+}
+  // , (prevProps, nextProps) => prevProps.data === nextProps.data
 )

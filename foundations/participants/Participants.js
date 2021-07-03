@@ -54,7 +54,7 @@ export default function Participants({ data }) {
             setUserState={setUserState}
           />
         </UserStateUiBox>
-
+ 
         {
           userState === "open" ?
             <Apply
@@ -92,7 +92,7 @@ const UserStateUi = memo(
       return <p>申込中です</p>
     }
     if (userState === "open") {
-      return <FormHeader setUserState={setUserState} titleText="参加申込"/>
+      return <FormHeader setState={setUserState} titleText="参加申込"/>
     }
     return (
       <p>{userState}</p>

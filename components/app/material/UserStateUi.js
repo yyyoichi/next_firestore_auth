@@ -6,11 +6,11 @@ export const UserStateUiBox = ({ children }) => {
   )
 }
 
-export const FormHeader = ({titleText, setUserState}) => {
+export const FormHeader = ({titleText, setState}) => {
   return (
     <>
       <h3 className="pt-2 px-4 border-b border-enji align-text-bottom mx-auto">{titleText}</h3>
-      <p className="text-sm p-2 ml-auto" onClick={() => setUserState("showButton")}>×</p>
+      <p className="text-sm p-2 ml-auto" onClick={() => setState("showButton")}>×</p>
     </>
   )
 }
