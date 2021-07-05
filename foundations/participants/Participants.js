@@ -1,6 +1,6 @@
 import EventInfo from "./EventInfo"
 import Apply from "./Apply"
-import App from "../../components/app/app"
+import Wrapper from "../../components/app/app"
 import { useUser } from "../../firebase/useUser"
 import { memo, useState } from "react";
 import { readMyData } from "../../components/system/readMyData";
@@ -46,7 +46,7 @@ export default function Participants({ data }) {
 
   return (
     <>
-      <App userData={userData}>
+      <Wrapper userData={userData}>
         <EventInfo data={data["eventData"]} />
         <UserStateUiBox>
           <UserStateUi
@@ -64,7 +64,7 @@ export default function Participants({ data }) {
             />
             : <></>
         }
-      </App>
+      </Wrapper>
     </>
   )
 }

@@ -3,7 +3,7 @@ import { memo, useState } from "react";
 import { fetcher, getUsersDbViaFireStore } from "../../components/system/Fetcher";
 import { useUser } from "../../firebase/useUser";
 import ReadQr from "../../components/qrcode/Reader";
-import App from "../../components/app/app";
+import Wrapper from "../../components/app/app";
 import formClasses from "../../components/app/formClasses";
 import EnjiButton from "../../components/app/material/EnjiButton";
 import { FormHeader, UserStateUiBox as QrStateUiBox } from "../../components/app/material/UserStateUi";
@@ -27,13 +27,15 @@ export default function OrganizerHome() {
     setQrState("getQr")
     const type = "getUsersForReader"
     getUsersDbViaFireStore(eventid, user["id"], { type })
-      .then(({ resUsersData, resDbData }) => {
+      .then(response => {
+        if (response === "no-data") return setQrState("no-data")
+        const { resUsersData, resDbData } = response
         setPrivateEventData(resDbData)
         const { token, usersDbUrl, eventName } = resDbData
         setQrAccessBasics((base) => {
           return { token, usersDbUrl, eventName, ...base }
         })
-        setUsersData(resUsersData)
+        setUsersData(resUsersData) 
         setQrState("showGrayButton")
         // setTimeout( console.log(qrAccessBasics), 2000)
       })
@@ -53,7 +55,7 @@ export default function OrganizerHome() {
   }
 
   return (
-    <App userData={userData} type="pc">
+    <Wrapper userData={userData} type="pc">
       <QrSetting data={privateEventData} handleChange={onChangeSetting} />
       <QrStateUiBox qrState={qrState}>
         <QrState qrState={qrState} setQrState={setQrState} />
@@ -67,7 +69,7 @@ export default function OrganizerHome() {
           />
           : <></>
       }
-    </App>
+    </Wrapper>
   )
 }
 
@@ -87,6 +89,9 @@ const QrState = memo(
     }
     if (qrState === "open") {
       return <></>
+    }
+    if (qrState === "no-data") {
+      return <p>データがありません</p>
     }
   }
   , (prevProps, nextProps) => prevProps.qrState === nextProps.qrState

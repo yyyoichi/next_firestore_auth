@@ -1,6 +1,6 @@
 import { memo, useState } from "react"
 import { useUser } from "../../firebase/useUser"
-import App from "../../components/app/app"
+import Wrapper from "../../components/app/app"
 import { readMyData } from "../../components/system/readMyData"
 import EnjiButton from "../../components/app/material/EnjiButton"
 import { UserStateUiBox, FormHeader } from "../../components/app/material/UserStateUi"
@@ -42,7 +42,7 @@ export default function Registration() {
   
   
   return (
-    <App userData={userData} type="pc">
+    <Wrapper userData={userData} type="pc">
       <CreateEventDiscriptions />
       <UserStateUiBox>
         <UserStateUi userState={userState} setUserState={setUserState} />
@@ -55,7 +55,7 @@ export default function Registration() {
           /> :
           <></>
       }
-    </App>
+    </Wrapper>
   )
 }
 

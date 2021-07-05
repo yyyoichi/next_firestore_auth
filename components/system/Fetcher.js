@@ -81,6 +81,7 @@ export const setupAllGate = async ({ folderId, sheetId }, d) => {
 export const getUsersDbViaFireStore = async (eventId, id, data) => {
   const res = await readEventData(eventId, id)//データベース情報
   console.log(res)
+  if(res === "no-data") return "no-data"
   const resUsersData = await getUsersDb(res, data)//イベント参加者情報
   console.log(resUsersData)
   return {resUsersData, resDbData: res}

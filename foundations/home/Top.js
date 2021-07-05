@@ -5,16 +5,16 @@ import { memo, useState } from "react";
 import { readMyData } from "../../components/system/readMyData";
 import Link from "next/link"
 import Image from "next/image"
-import App from "../../components/app/app";
+import Wrapper from "../../components/app/app";
 
 export default function Top() {
   const userData = useUser()
   const { user, logout } = userData
   if (user) {
     return (
-      <App userData={userData} type="sp">
+      <Wrapper userData={userData} type="sp">
         <MyPage user={user} logout={logout} />
-      </App>
+      </Wrapper>
     )
   } else return <Lp />
 }

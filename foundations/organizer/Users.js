@@ -1,110 +1,70 @@
-import { createContext, useState } from "react";
+import { createContext, memo, useState } from "react";
 import { useUser } from "../../firebase/useUser";
 import { fetcher, getUsersDb, getUsersDbViaFireStore } from "../../components/system/Fetcher";
 import OneUser from "./UsersTable";
-
-export const UsersStateContext = createContext()
+import Wrapper from "../../components/app/App"
+import { UserStateUiBox } from "../../components/app/material/UserStateUi";
+import EditUsersTable from "./UsersTable";
 
 export default function Users({ data }) {
-  const { user, logout } = useUser()
+  const userData = useUser()
+  const { user } = userData
   const { eventId, key, registrationItems } = data["registration"]
 
   const [usersData, setUsersData] = useState([])
   //eventName,gatesUrl, key, token, usersDbUrl
-  const [dbData, setDbData] = useState({})//firestoreに保存されているデータ
-  const [submitState, setSubmitState] = useState("proper")
-  const [usersState, setUserState] = useState({})//5:{accesstoken, state, userId}
+  const [privateEventData, setPrivateEventData] = useState({})//firestoreに保存されているデータ
+  const [setupState, setSetupState] = useState("setup")
 
-  if (user && submitState === "proper") {
-    setSubmitState("processing")
+  if (user && setupState === "setup") {
+    setSetupState("getData")
     const type = "getUsers"
     getUsersDbViaFireStore(eventId, user["id"], { type })
-      .then(({ resUsersData, resDbData }) => {
-        setDbData(resDbData)
+      .then(response => {
+        if (response === "no-data") {
+          return setSetupState(response)
+        }
+        const { resUsersData, resDbData } = response
+        if (!resUsersData.length) {
+          return setSetupState("no-data")
+        }
+        setPrivateEventData(resDbData)
         setUsersData(resUsersData)
+        setSetupState("open")
       })
   }
 
-  const handleClick = (e) => {
-    // console.log(e.target.value)
-    // if (submitState === "submitting") return
-    const name = e.target.name
-    const [rowIndex, userId, access_token, initState] = name.split("&&")
-    const state = e.target.value
-    if (initState === state) {//元の値と同じとき
-      // const {rowIndex, ...newUsersState} = usersState
-      const newUsersState = { ...usersState, [rowIndex]: undefined }
-      console.log(newUsersState)
-      setUserState(newUsersState)
-    } else {
-      const data = { userId, access_token, state }
-      const newUsersState = { ...usersState, [rowIndex]: data }
-      setUserState(newUsersState)
-    }
-    console.log(usersState)
-  }
-
-  const eventRegister = (event) => {
-    if (usersState == {}) return alert("操作がありませんでした")
-    setSubmitState("submitting")
-    event.preventDefault()
-
-    console.log("send")
-    console.log(usersState)
-
-    const url = process.env.NEXT_PUBLIC_USER_DATABASE_URL
-    const token = process.env.NEXT_PUBLIC_GAS_API_KEY
-    const data = {
-      "type": "updateUsers",
-      token,
-      "path": `${eventId}/${key}`,
-      usersState,
-      "eventName": dbData["eventName"],
-    }
-    console.log(data)
-    // return;
-    fetcher(url, data)
-    .then(res => {
-      console.log("res")
-      console.log(res)
-      const updateUsers = res["res"]
-      return getUsersDb(dbData, { "type": "updateUsers", "usersState":updateUsers })
-    })
-    .then(res => {
-      console.log(res)
-      setUserState({})
-      setUsersData(res)//新しいイベント参加者情報
-      setSubmitState("processing")
-    })
-    
-  }
-
-  if (!user) return <a href="/auth">LOGIN</a>
   return (
-    <div>
-      <table>
-        <thead>
-          <tr>
-            <th>許可</th>
-            <th>現状</th>
-            {registrationItems.map(({ header }, i) => <th key={i}>{header}</th>)}
-          </tr>
-        </thead>
-        <tbody>
-          <UsersStateContext.Provider value={usersState}>
-            {
-              !usersData.length ?
-                <tr><td>getData...</td></tr> :
-                usersData.map((x, i) => <OneUser handle={handleClick} key={i} user={x} />)
-            }
-          </UsersStateContext.Provider>
-        </tbody>
-      </table>
-      {
-        submitState === "submitting" || !usersData.length ?
-          <></> :
-          <button onClick={(e) => eventRegister(e)}>send</button>
+    <Wrapper userData={userData} type="pc">
+      <UserStateUiBox>
+        <SetupState setupState={setupState} />
+      </UserStateUiBox>
+      {setupState === "open" ?
+        (
+          <EditUsersTable
+            usersData={usersData}
+            eventData={{ ...privateEventData, ...data["registration"] }}
+          />
+        )
+        : <></>
       }
-    </div>
+    </Wrapper>
   )
 }
+
+const SetupState = memo(
+  ({ setupState }) => {
+    console.log(setupState)
+    if (setupState === "setup") {
+      return <p>ログインが必要です</p>
+    }
+    if (setupState === "getData") {
+      return <p>データ取得中です。</p>
+    }
+    if (setupState === "open") {
+      return <></>
+    }
+    return <></>
+  }
+  // , (prevProps, nextProps) => prevProps.qrState === nextProps.qrState
+)

@@ -23,7 +23,7 @@ export const readEventData = async (eventId, id) => {
       return data.data()
     }else{
       console.log("no Data")
-      return new Error("no Data")
+      return "no-data"
     }
   } catch (e) {
     console.log(e)
