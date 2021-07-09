@@ -1,11 +1,10 @@
-import { memo, useContext, useState } from "react"
-import EnjiButton from "../../components/app/material/EnjiButton"
-import { UserStateUiBox } from "../../components/app/material/UserStateUi"
+import { memo, useState } from "react"
 
 const EditUsersTable = ({ usersData, eventData }) => {
   const [submitState, setSubmitState] = useState("proper")
   const [usersState, setUsersState] = useState({})//5:{accesstoken, state, userId}
-  const handleClick = (e) => {
+
+  const handleChange = (e) => {
     // console.log(e.target.value)
     // if (submitState === "submitting") return
     const name = e.target.name
@@ -60,39 +59,41 @@ const EditUsersTable = ({ usersData, eventData }) => {
 
   }
   return (
-    <div className="flex flex-col mx-auto px-2 md:w-4/5">
-      <UsersTable registrationItems={eventData["registrationItems"]}>
-        {
-          usersData.map((user, i) => {
-            return (
-              <tr key={i}>
-                <UserLabel
-                  usersState={usersState}
-                  user={user}
-                  handleClick={handleClick}
-                />
-                <td>{user["state"]}</td>
-                {user["info"].map(x => <td key={x}>{x}</td>)}
-              </tr>
-            )
-          })
-          // usersData.map((x, i) =>{<OneUser handle={handleClick} key={i} user={x} />})
-        }
-      </UsersTable>
-      <SubmitStateUi submitState={submitState} eventRegister={eventRegister} />
-    </div>
+    <form onSubmit={eventRegister}>
+      <div className="flex flex-col mx-auto px-2 md:w-4/5">
 
+        <UsersTable registrationItems={eventData["registrationItems"]}>
+          {
+            usersData.map((user, i) => {
+              return (
+                <tr key={i}>
+                  <UserLabel
+                    usersState={usersState}
+                    handleChange={handleChange}
+                    user={user}
+                  />
+                  <td>{user["state"]}</td>
+                  {user["info"].map(x => <td key={x}>{x}</td>)}
+                </tr>
+              )
+            })
+            // usersData.map((x, i) =>{<OneUser handle={handleClick} key={i} user={x} />})
+          }
+        </UsersTable>
+        <SubmitStateUi submitState={submitState} />
+      </div>
+    </form>
   )
 }
 export default EditUsersTable
 
 const SubmitStateUi = memo(
-  ({ submitState, eventRegister }) => {
+  ({ submitState }) => {
     if (submitState !== "submitting") {
-      const handleClick = e => eventRegister(e)
+      // const handleClick = e => eventRegister(e)
       return <button
         className="mx-auto mt-auto mb-5 py-2 px-6 bg-enji text-gray-50 rounded-md"
-        handleClick={handleClick}>終了する</button>
+        type="submit">終了する</button>
     }
     return (
       <></>
@@ -101,7 +102,7 @@ const SubmitStateUi = memo(
   , (prevProps, nextProps) => prevProps.submitState === nextProps.submitState
 )
 
-const UserLabel = ({ user, handleClick, usersState }) => {
+const UserLabel = ({ user, handleChange, usersState }) => {
   const { rowIndex, access_token, userId } = user
   const initState = user["state"]
   const nowsUser = usersState[rowIndex] || user
@@ -115,7 +116,7 @@ const UserLabel = ({ user, handleClick, usersState }) => {
             type="radio"
             name={inputName}
             value="yes"
-            onChange={(e) => handleClick(e)}
+            onChange={(e) => handleChange(e)}
             checked={editState === "yes"}
           />
           許可</label>
@@ -124,7 +125,7 @@ const UserLabel = ({ user, handleClick, usersState }) => {
             type="radio"
             name={inputName}
             value="no"
-            onChange={(e) => handleClick(e)}
+            onChange={(e) => handleChange(e)}
             checked={editState === "no"}
           />
           不許可</label>

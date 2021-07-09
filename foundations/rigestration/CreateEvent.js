@@ -30,7 +30,7 @@ const CreateEvent = ({ user, heldEventsId }) => {
     resetTime: 0
   }
   const [forms, setForms] = useState(init)
-  const token = Token
+  const token = Token()
   const [submitState, setSubmitState] = useState(false)
   const router = useRouter()
 

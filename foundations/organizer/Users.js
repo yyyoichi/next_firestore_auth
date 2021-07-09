@@ -1,15 +1,14 @@
-import { createContext, memo, useState } from "react";
+import {  memo, useState } from "react";
 import { useUser } from "../../firebase/useUser";
-import { fetcher, getUsersDb, getUsersDbViaFireStore } from "../../components/system/Fetcher";
-import OneUser from "./UsersTable";
-import Wrapper from "../../components/app/App"
+import { getUsersDbViaFireStore } from "../../components/system/Fetcher";
 import { UserStateUiBox } from "../../components/app/material/UserStateUi";
 import EditUsersTable from "./UsersTable";
+import WrapperPc from "../../components/app/AppPc";
 
 export default function Users({ data }) {
   const userData = useUser()
   const { user } = userData
-  const { eventId, key, registrationItems } = data["registration"]
+  const { eventId } = data["registration"]
 
   const [usersData, setUsersData] = useState([])
   //eventName,gatesUrl, key, token, usersDbUrl
@@ -35,7 +34,7 @@ export default function Users({ data }) {
   }
 
   return (
-    <Wrapper userData={userData} type="pc">
+    <WrapperPc userData={userData}>
       <UserStateUiBox>
         <SetupState setupState={setupState} />
       </UserStateUiBox>
@@ -48,7 +47,7 @@ export default function Users({ data }) {
         )
         : <></>
       }
-    </Wrapper>
+    </WrapperPc>
   )
 }
 

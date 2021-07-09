@@ -2,17 +2,10 @@
 import Header from "./Header"
 import Footer from "./Footer"
 import { memo } from "react"
-const Wrapper = memo(
+const WrapperPc = memo(
   (props) => {
-    // console.log("app^render")
     const userData = props.userData
-    // const type = props["type"] || "sp"
-    // console.log(type)
-    const baseClass = "flex flex-col min-h-screen font-ui-monospace bg-gray-50"
-    // const wrapClass =
-    //   type === "sp" ? baseClass + " md:max-w-screen-sm md:mx-auto" : baseClass
-    
-
+    const baseClass = "flex flex-col min-h-screen font-ui-monospace bg-gray-50 md:max-w-screen-sm md:mx-auto"
 
     return (
       <>
@@ -29,4 +22,4 @@ const Wrapper = memo(
   , (prevProps, nextProps) => prevProps.userData === nextProps.userData
 )
 
-export default Wrapper
+export default WrapperPc

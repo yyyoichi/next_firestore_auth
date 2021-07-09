@@ -18,7 +18,7 @@ const firebaseAuthConfig = {
             requireDisplayName: true,
         },
         // add additional auth flows below
-        // firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
         // firebase.auth.TwitterAuthProvider.PROVIDER_ID,
         // firebase.auth.GithubAuthProvider.PROVIDER_ID,
     ],

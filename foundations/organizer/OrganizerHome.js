@@ -9,6 +9,7 @@ import EnjiButton from "../../components/app/material/EnjiButton";
 import { FormHeader, UserStateUiBox as QrStateUiBox } from "../../components/app/material/UserStateUi";
 import GrayButton from "../../components/app/material/GrayButton";
 import QrBox from "./QrBox";
+import WrapperPc from "../../components/app/AppPc";
 
 export default function OrganizerHome() {
   const router = useRouter()
@@ -55,7 +56,7 @@ export default function OrganizerHome() {
   }
 
   return (
-    <Wrapper userData={userData} type="pc">
+    <WrapperPc userData={userData}>
       <QrSetting data={privateEventData} handleChange={onChangeSetting} />
       <QrStateUiBox qrState={qrState}>
         <QrState qrState={qrState} setQrState={setQrState} />
@@ -69,7 +70,7 @@ export default function OrganizerHome() {
           />
           : <></>
       }
-    </Wrapper>
+    </WrapperPc>
   )
 }
 
